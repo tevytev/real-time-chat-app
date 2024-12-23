@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
+  if (this.isModified('password')) {
     try {
       const salt = await bcrypt.genSalt(10);
       this.password = await bcrypt.hash(this.password, salt);
@@ -42,9 +42,11 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
   try {
-    const isMatch = await bcyrpt.compare(candidatePassword, this.password);
-    return isMatch;
+    // Use bcrypt to compare the plain password with the hashed password
+    const isMatch = await bcrypt.compare(candidatePassword, this.password);
+    return isMatch; // Return whether the passwords match
   } catch (error) {
+    console.error('Error during password comparison:', error);
     throw new Error("Password comparison failed");
   }
 };

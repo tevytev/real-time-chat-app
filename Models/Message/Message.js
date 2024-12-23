@@ -12,12 +12,12 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  userId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId, // Reference to User's id
     ref: "User", // Name of the User model
     required: true, // Every message must be associated with a user
   },
-  roomId: {
+  room: {
     type: mongoose.Schema.Types.ObjectId, // Reference to room's id
     ref: "Room", // Name of the Room model
     required: true, // Every message must be associated with a room
