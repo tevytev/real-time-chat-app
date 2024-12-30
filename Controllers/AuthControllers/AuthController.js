@@ -5,7 +5,6 @@ const {
   storeRefreshToken,
 } = require("./AccessTokenControllers/generateAccessToken");
 require("dotenv").config();
-const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -31,8 +30,6 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  let accessToken = null;
-  let refreshToken = null;
 
   try {
     // Find the user by email
@@ -49,16 +46,21 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Create JWT token and refresh token if the passwords match
     const payload = { id: user._id, username: user.username };
-    // Create JWT token if the passwords match
-    accessToken = generateAccessToken(payload);
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
 
-    if (accessToken !== null) {
-      refreshToken = generateRefreshToken(payload);
-      if (refreshToken !== null) storeRefreshToken(user._id, refreshToken);
-    }
+    // Store refresh token in database
+    await storeRefreshToken(user._id, refreshToken);
 
-    res.status(200).json({ token });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true, // cookie is not accessible via Javascript
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
+    });
+
+    res.status(200).json({ accessToken });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: "Server error" });

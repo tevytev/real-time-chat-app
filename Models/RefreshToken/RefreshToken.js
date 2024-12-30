@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 
 const refreshTokenSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    token: { type: String, required: true }
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    token: { type: String, required: true },
+    dateCreated: { type: Date, default: Date.now },
 })
 
 const RefreshToken = mongoose.model("RefreshToken", refreshTokenSchema);

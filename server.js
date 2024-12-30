@@ -6,6 +6,8 @@ const { db } = require("./Models/index");
 const messageRoutes = require("./Routes/messageRoutes");
 const userRoutes = require("./Routes/userRoutes");
 const authRoutes = require("./Routes/authRoutes");
+const roomRoutes = require("./Routes/roomRoutes");
+const FamilyRoutes = require("./Routes/familyRoutes");
 
 // middleware
 app.use(bodyParser.json());
@@ -16,8 +18,14 @@ const PORT = process.env.PORT || 3000;
 // message routes
 app.use("/api/message", messageRoutes);
 
+// room routes
+app.use("/api/rooms", roomRoutes);
+
 // user routes
 app.use("/api/user", userRoutes);
+
+// family routes
+app.use("/api/family", FamilyRoutes);
 
 // auth routes
 app.use("/api/auth", authRoutes);
@@ -25,6 +33,7 @@ app.use("/api/auth", authRoutes);
 const expressServer = app.listen(PORT, () => {
   console.log(`Server is connected to ${PORT}`);
 });
+
 /*["http://localhost:5173/"]*/
 const corsOptions = {
   origin: "*",
@@ -67,6 +76,10 @@ io.on("connection", (socket) => {
     console.log(
       `${socket.id} is in room: ${roomName} and just sent the message ${message}`
     );
+
+    setTimeout(() => {
+      socket.emit("clientMessage", { text: message });
+    }, 1000);
   });
 
   // User disconnects
@@ -76,3 +89,7 @@ io.on("connection", (socket) => {
 });
 
 db();
+
+module.exports = {
+  io
+}

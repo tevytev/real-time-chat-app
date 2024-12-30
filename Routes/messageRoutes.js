@@ -1,8 +1,13 @@
 const express = require("express");
-const { getMessage } = require("../Controllers/MessageControllers/MessageController")
+const { verifyJWT } = require("../Middleware/AuthMiddleware/authMiddleware");
+const {
+  getMessages,
+  createMessage,
+} = require("../Controllers/MessageControllers/MessageController");
 
 const router = express.Router();
 
-router.get("/", getMessage);
+router.get("/:roomId", verifyJWT, getMessages);
+router.post("/", verifyJWT, createMessage);
 
 module.exports = router;

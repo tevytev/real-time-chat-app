@@ -9,11 +9,11 @@ const familySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   dateCreated: { type: Date, default: Date.now },
 });
 
 const Family = mongoose.model("Family", familySchema);
 module.exports = {
   Family,
-}
+};
