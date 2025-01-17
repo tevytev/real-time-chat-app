@@ -1,10 +1,10 @@
 const { User } = require("../../Models/User/User");
 
 const getUser = async (req, res) => {
-    const { username } = req.params;
-    const user = await User.findOne({ "username" : username }, "username email");
+    const { userId } = req.params;
+    const user = await User.findOne({ "_id" : userId }, "username email");
     console.log(user);
-    res.status(201).json({ message: "success" });
+    res.status(201).json(user);
 
 };
 

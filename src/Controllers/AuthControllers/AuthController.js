@@ -57,16 +57,55 @@ const loginUser = async (req, res) => {
     await storeRefreshToken(user._id, refreshToken);
 
     // Set and send new refresh token cookie and access token
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+      sameSite: 'lax', // or 'Lax' for less strict behavior
+      maxAge: 60 * 60 * 1000, // e.g., 15 minutes expiration
+      domain: "localhost",
+    });
+
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true, // cookie is not accessible via Javascript
       secure: process.env.NODE_ENV === "production",
+      sameSite: 'Lax', // or 'Lax' for less strict behavior
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
+      domain: "localhost",
     });
 
-    res.status(200).json({ accessToken });
+    res.status(200).json({ user });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+const logoutUser = async (req, res) => {
+  try {
+    const refreshTokenFromCookie = req.cookies.refreshToken;
+
+    if (!refreshTokenFromCookie) {
+      res.status(400).json({ message: "No refresh token provided" });
+    }
+
+    const deletedToken = await RefreshToken.deleteOne({ token: refreshTokenFromCookie });
+
+    if (deletedToken.deletedCount === 0) {
+      return res.status(400).json({ message: 'Refresh token not found or already deleted' });
+    }
+
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      path: '/'
+    });
+
+    res.status(200).json({ message: "Logged out successfully" });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "An error occured while logging out" });
   }
 };
 
@@ -81,15 +120,14 @@ const refresh = async (req, res) => {
 
     // Verify the refresh token using jsonwebtoken library
     const decodedRefreshToken = verifyRefreshToken(refreshTokenFromCookie);
-    if (!decodedRefreshToken)
-      return res.status(403).json({ message: "invalid or expired token" });
+    if (!decodedRefreshToken) return res.status(403).json({ message: "invalid or expired token" });
 
     // Look up refresh token in database
     const storedRefreshToken = await RefreshToken.findOne({
       token: refreshTokenFromCookie,
     });
-    if (!storedRefreshToken)
-      return res.status(403).json({ message: "invalid refresh token" });
+
+    if (!storedRefreshToken) return res.status(403).json({ message: "invalid refresh token" });
 
     // Find user and generate new access token and new refresh token
     const user = await User.findById(storedRefreshToken.userId);
@@ -111,9 +149,20 @@ const refresh = async (req, res) => {
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true, // cookie is not accessible via Javascript
       secure: process.env.NODE_ENV === "production",
+      sameSite: 'Lax', // or 'Lax' for less strict behavior
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
+      domain: "localhost",
     });
-    res.json({ accessToken: newAccessToken });
+
+    res.cookie('access_token', newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+      sameSite: 'lax', // or 'Lax' for less strict behavior
+      maxAge: 60 * 60 * 1000, // e.g., 15 minutes expiration
+      domain: "localhost",
+    });
+    res.status(200).json({ user });
+
   } catch (error) {
     console.error("Error during token refresh:", error);
     res.status(500).json({ message: "Server error" });
@@ -123,5 +172,6 @@ const refresh = async (req, res) => {
 module.exports = {
   registerUser,
   loginUser,
+  logoutUser,
   refresh
 };

@@ -1,0 +1,22 @@
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    /* gap: 10px; */
+    width: 100vw;
+    height: 100vh;
+    max-width: 1400px;
+}
+
+.dashboard-chat-container {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    align-items: stretch;
+    /* gap: 10px; */
+    height: 80%;
+    min-height: 585px;
+    width: 100%;
+    /* border-radius: 3px 3px 20px 20px; */
+}

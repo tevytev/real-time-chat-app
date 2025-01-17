@@ -7,7 +7,8 @@ const roomSchema = new mongoose.Schema({
     required: true
   },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  dateCreated: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now }, 
+  updatedAt: { type: Date, default: Date.now }
 });
 
 const Room = mongoose.model("Room", roomSchema);

@@ -15,6 +15,32 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// ["http://localhost:5173/"]
+const corsOptions = {
+  origin: "http://localhost:5173",
+  methods: ["POST", "PUT", "GET", "DELETE", "OPTIONS", "HEAD"],
+  credentials: true,
+  optionSuccessStatus: 200,
+  allowedHeaders: [
+    "Set-Cookie",
+    "Content-Type",
+    "Access-Control-Allow-Origin",
+    "Access-Control-Allow-Credentials",
+    "withCredentials",
+    "Authorization",
+  ],
+};
+
+app.use(cors(corsOptions));
+
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:5173'); // Allow your origin
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD'); // Allow methods
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Set-Cookie, withCredentials'); // Allow headers
+  res.header('Access-Control-Allow-Credentials', 'true'); // Allow credentials (cookies, headers)
+  res.sendStatus(200); // OK response for preflight
+});
+
 const PORT = process.env.PORT || 3000;
 
 // message routes
@@ -36,24 +62,6 @@ const expressServer = app.listen(PORT, () => {
   console.log(`Server is connected to ${PORT}`);
 });
 
-/*["http://localhost:5173/"]*/
-const corsOptions = {
-  origin: "*",
-  methods: ["POST", "PUT", "GET", "DELETE", "OPTIONS", "HEAD"],
-  credentials: true,
-  optionSuccessStatus: 200,
-  allowedHeaders: [
-    "Set-Cookie",
-    "Content-Type",
-    "Access-Control-Allow-Origin",
-    "Access-Control-Allow-Credentials",
-    "withCredentials",
-    "Authorization",
-  ],
-};
-
-app.use(cors(corsOptions));
-
 const io = new Server(expressServer, {
   cors: corsOptions,
 });
@@ -63,27 +71,27 @@ io.on("connection", (socket) => {
   console.log("a user connected");
 
   // Listen for a user joining a room
-  socket.on("joinRoom", (roomName) => {
-    console.log(`${socket.id} joined room: ${roomName}`);
+  socket.on("joinRoom", (roomId) => {
+    console.log(`${socket.id} joined room: ${roomId}`);
 
     // User joins room
-    socket.join(roomName);
+    socket.join(roomId);
 
     // Broadcast to other all other clients in room that user has joined room
-    io.to(roomName).emit(
+    io.to(roomId).emit(
       "message",
-      `A new user has joined the room: ${roomName}`
+      `A new user has joined the room: ${roomId}`
     );
   });
 
   // Listen for a message from a specific room
-  socket.on("message", (roomName, message) => {
+  socket.on("sendMessage", (roomId, message) => {
     
     // Broadcast message to all other clients in room
-    io.to(roomName).emit("serverMessage", { text: message});
+    io.to(roomId).emit("receiveMessage", message);
 
     console.log(
-      `${socket.id} is in room: ${roomName} and just sent the message ${message}`
+      `${socket.id} is in room: ${roomId} and just sent the message ${message}`
     );
   });
 

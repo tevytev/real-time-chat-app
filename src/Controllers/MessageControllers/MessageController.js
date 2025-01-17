@@ -8,7 +8,7 @@ const getMessages = async (req, res) => {
   try {
     // Find messages with query to distinguish what messages to skip and the limited amount to send to client
     const messages = await Message.find({ room: roomId })
-      .sort("createdAt")
+      .sort({ dateCreated: -1 })
       .skip(Number(skip))
       .limit(Number(limit));
     res.status(200).json(messages);
@@ -38,11 +38,14 @@ const createMessage = async (req, res) => {
       user: id,
       room: roomId,
     });
+
     const savedMessage = await newMessage.save();
+    room.updatedAt = Date.now();
+    await room.save();
 
     // Message save success
     if (savedMessage) {
-      res.status(201).json({ message: "success" });
+      res.status(201).json({ message: newMessage });
     }
   } catch (error) {
     console.error("Error during message:", error);

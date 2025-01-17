@@ -14,6 +14,6 @@ router.use(verifyAccessToken);
 router.get("/:roomId", getMessages);
 
 // Create message
-router.post("/:roodId", createMessage);
+router.post("/:roomId", createMessage);
 
 module.exports = router;

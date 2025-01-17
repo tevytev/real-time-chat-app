@@ -1,0 +1,110 @@
+.header-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    /* gap: 10px; */
+    width: 100%;
+    height: 100px;
+}
+
+.header-family-status-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--primary);
+    padding: 1rem;
+    height: 100%;
+    width: 70%;
+    border-radius: 10px 0 0 0;
+    overflow-x: scroll;
+}
+
+.header-family-status-container::-webkit-scrollbar {
+    display: none;
+}
+
+.header-user-status-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--dark);
+    height: 100%;
+    width: 30%;
+    border-radius: 0 10px 0 0;
+    position: relative;
+    color: var(--white);
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+}
+
+.header-user-pfp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: var(--white);
+    border-radius: 100px;
+    font-size: 1.5rem;
+    color: var(--black);
+}
+
+.header-user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    height: 100%;
+    /* border: solid red; */
+}
+
+.header-user-info h1 {
+    font-weight: 500;
+    font-size: 1.3rem;
+}
+
+.header-user-info p {
+    font-size: .7rem;
+}
+
+#user-settings {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1 / 1;
+    height: 30px;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 2rem;
+    border-radius: 100px;
+    transition: all 100ms ease-out;
+    cursor: pointer;
+}
+
+#user-settings:hover {
+    background-color: var(--darker);
+
+}
+
+#user-options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1 / 1;
+    height: 30px;
+    position: absolute;
+    top: 1rem;
+    right: 4rem;
+    font-size: 2rem;
+    border-radius: 100px;
+    transition: all 100ms ease-out;
+    cursor: pointer;
+}
+
+#user-options:hover {
+    background-color: var(--darker);
+
+}
