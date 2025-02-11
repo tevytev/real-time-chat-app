@@ -1,4 +1,5 @@
 const { User } = require("../../Models/User/User");
+const { Status } = require("../../Models/Status/Status");
 const { RefreshToken } = require("../../Models/RefreshToken/RefreshToken");
 const {
   generateAccessToken,
@@ -10,20 +11,63 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
 
   try {
     // check if user already exists already
     const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ message: "User already exists" });
+    if (userExists)
+      return res.status(400).json({ message: "User already exists" });
 
     // Create user
-    const newUser = await User({ username, email, password });
+    const newUser = await User({
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: password,
+      family: null,
+      profilePic: null
+    });
 
-    // Save user to database
+    // Create empty user status
+    const newStatus = await Status({
+      mood: 3,
+      feelings: "",
+      availability: "",
+      thoughts: "",
+      user: newUser._id
+    });
+
+    // Save user and status to database
     await newUser.save();
+    await newStatus.save();
 
-    return res.status(201).json({ message: "User registered successfully" });
+    // Create JWT token and refresh token if the passwords match
+    const payload = { id: newUser._id, email: newUser.email };
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
+
+    // Store refresh token in database
+    await storeRefreshToken(newUser._id, refreshToken);
+
+    // Set and send new refresh token cookie and access token
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
+      sameSite: "lax", // or 'Lax' for less strict behavior
+      maxAge: 60 * 60 * 1000, // e.g., 15 minutes expiration
+      domain: "localhost",
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true, // cookie is not accessible via Javascript
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax", // or 'Lax' for less strict behavior
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
+      domain: "localhost",
+    });
+
+    return res.status(201).json({ newUser });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error" });
@@ -49,7 +93,7 @@ const loginUser = async (req, res) => {
     }
 
     // Create JWT token and refresh token if the passwords match
-    const payload = { id: user._id, username: user.username };
+    const payload = { id: user._id, email: user.email };
     const accessToken = generateAccessToken(payload);
     const refreshToken = generateRefreshToken(payload);
 
@@ -57,10 +101,10 @@ const loginUser = async (req, res) => {
     await storeRefreshToken(user._id, refreshToken);
 
     // Set and send new refresh token cookie and access token
-    res.cookie('access_token', accessToken, {
+    res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-      sameSite: 'lax', // or 'Lax' for less strict behavior
+      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
+      sameSite: "lax", // or 'Lax' for less strict behavior
       maxAge: 60 * 60 * 1000, // e.g., 15 minutes expiration
       domain: "localhost",
     });
@@ -68,7 +112,7 @@ const loginUser = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true, // cookie is not accessible via Javascript
       secure: process.env.NODE_ENV === "production",
-      sameSite: 'Lax', // or 'Lax' for less strict behavior
+      sameSite: "Lax", // or 'Lax' for less strict behavior
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "localhost",
     });
@@ -88,21 +132,24 @@ const logoutUser = async (req, res) => {
       res.status(400).json({ message: "No refresh token provided" });
     }
 
-    const deletedToken = await RefreshToken.deleteOne({ token: refreshTokenFromCookie });
+    const deletedToken = await RefreshToken.deleteOne({
+      token: refreshTokenFromCookie,
+    });
 
     if (deletedToken.deletedCount === 0) {
-      return res.status(400).json({ message: 'Refresh token not found or already deleted' });
+      return res
+        .status(400)
+        .json({ message: "Refresh token not found or already deleted" });
     }
 
     res.clearCookie("access_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-      path: '/'
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      path: "/",
     });
 
     res.status(200).json({ message: "Logged out successfully" });
-
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "An error occured while logging out" });
@@ -120,14 +167,16 @@ const refresh = async (req, res) => {
 
     // Verify the refresh token using jsonwebtoken library
     const decodedRefreshToken = verifyRefreshToken(refreshTokenFromCookie);
-    if (!decodedRefreshToken) return res.status(403).json({ message: "invalid or expired token" });
+    if (!decodedRefreshToken)
+      return res.status(403).json({ message: "invalid or expired token" });
 
     // Look up refresh token in database
     const storedRefreshToken = await RefreshToken.findOne({
       token: refreshTokenFromCookie,
     });
 
-    if (!storedRefreshToken) return res.status(403).json({ message: "invalid refresh token" });
+    if (!storedRefreshToken)
+      return res.status(403).json({ message: "invalid refresh token" });
 
     // Find user and generate new access token and new refresh token
     const user = await User.findById(storedRefreshToken.userId);
@@ -149,20 +198,19 @@ const refresh = async (req, res) => {
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true, // cookie is not accessible via Javascript
       secure: process.env.NODE_ENV === "production",
-      sameSite: 'Lax', // or 'Lax' for less strict behavior
+      sameSite: "Lax", // or 'Lax' for less strict behavior
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "localhost",
     });
 
-    res.cookie('access_token', newAccessToken, {
+    res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-      sameSite: 'lax', // or 'Lax' for less strict behavior
+      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
+      sameSite: "lax", // or 'Lax' for less strict behavior
       maxAge: 60 * 60 * 1000, // e.g., 15 minutes expiration
       domain: "localhost",
     });
     res.status(200).json({ user });
-
   } catch (error) {
     console.error("Error during token refresh:", error);
     res.status(500).json({ message: "Server error" });
@@ -173,5 +221,5 @@ module.exports = {
   registerUser,
   loginUser,
   logoutUser,
-  refresh
+  refresh,
 };

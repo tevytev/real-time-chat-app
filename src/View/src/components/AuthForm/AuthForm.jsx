@@ -5,14 +5,17 @@ export default function AuthForm(props) {
   const {
     authType,
     setAuthType,
-    username,
-    setUsername,
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
     email,
     setEmail,
     password,
     setPassword,
-    handleSubmit,
-    clearInputs
+    handleLogin,
+    handleSignup,
+    clearInputs,
   } = props;
 
   if (authType === "login") {
@@ -103,7 +106,9 @@ export default function AuthForm(props) {
               type="password"
               autoComplete="on"
             />
-            <button onClick={handleSubmit} id="login-btn">Login</button>
+            <button onClick={handleLogin} className="auth-btn" id="login-btn">
+              Login
+            </button>
           </form>
           <small>
             <span
@@ -196,21 +201,30 @@ export default function AuthForm(props) {
           <h1 className="auth-header">Signup</h1>
           <form action="">
             <input
+              value={firstName}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+              }}
+              className="auth-input"
+              placeholder="First Name"
+              type="text"
+            />
+            <input
+              value={lastName}
+              onChange={(e) => {
+                setLastName(e.target.value);
+              }}
+              className="auth-input"
+              placeholder="Last Name"
+              type="text"
+            />
+            <input
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
               }}
               className="auth-input"
               placeholder="Email"
-              type="text"
-            />
-            <input
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-              className="auth-input"
-              placeholder="Username"
               type="text"
             />
             <input
@@ -223,7 +237,7 @@ export default function AuthForm(props) {
               type="password"
               autoComplete="on"
             />
-            <button id="login-btn">Signup</button>
+            <button onClick={handleSignup} id="login-btn">Signup</button>
           </form>
           <small>
             <span

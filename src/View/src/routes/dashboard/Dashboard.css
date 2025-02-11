@@ -20,3 +20,15 @@
     width: 100%;
     /* border-radius: 3px 3px 20px 20px; */
 }
+
+.dashboard-status-container {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    align-items: stretch;
+    /* gap: 10px; */
+    height: 80%;
+    min-height: 585px;
+    width: 100%;
+    /* border-radius: 3px 3px 20px 20px; */
+}

@@ -1,0 +1,58 @@
+.familysetup-header {
+    color: #171717;
+    font-size: 2rem;
+}
+
+.familysetup-subheader {
+    color: var(--black);
+    font-weight: normal;
+}
+
+.auth-btn {
+    background-color: var(--primary);
+    color: #fff;
+    height: 50px;
+    width: 100%;
+    border: solid 2px var(--primary);
+    border-radius: 50px;
+    padding: 0 1rem;
+    cursor: pointer;
+}
+
+.auth-btn:hover {
+    background-color: #ffffff;
+    color: var(--primary);
+    transition: all 100ms ease-out;
+}
+
+.family-auth-back-btn {
+    width: auto;
+    top: 1rem;
+    left: 1rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: .5rem;
+    border: solid transparent 2px;
+    background-color: transparent;
+    color: var(--black);
+    border-radius: 50px;
+    padding: .5rem .6rem;
+    position: absolute;
+    cursor: pointer;
+    transition: all 100ms ease-out;
+}
+
+.family-auth-back-btn:hover {
+    color: var(--white);
+    background-color: var(--primary);
+}
+
+.family-auth-back-btn:hover i {
+    color: var(--lighter);
+}
+
+.family-auth-back-btn i {
+    color: var(--primary);
+    font-size: 1.3rem;
+}

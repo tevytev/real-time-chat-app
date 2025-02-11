@@ -1,0 +1,191 @@
+.user-status-card-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 100%;
+  width: 100%;
+  gap: 1rem;
+  background-color: var(--white);
+}
+
+.user-status-top-container {
+  color: var(--black);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 2rem 1rem 1rem 1rem;
+  background-color: var(--primary);
+  /* box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset,
+    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset; */
+}
+
+.user-status-message-container {
+  overflow-y: scroll;
+  height: 100px;
+  max-height: 200px;
+  padding: 10px;
+  width: 100%;
+  /* background-color: var(--primary); */
+  border-radius: 5px;
+  border: solid 2px var(--offwhite);
+}
+
+.user-status-message-container::-webkit-scrollbar {
+  display: none;
+}
+
+.user-status-name-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  color: var(--white);
+}
+
+.user-status-name-container p {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.user-status-bottom-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  /* border: solid red; */
+  height: auto;
+  width: 100%;
+  padding: 1rem 1rem;
+}
+
+
+.user-mood-radio-input input {
+  display: none;
+}
+
+.user-mood-radio-input {
+  --container_width: 300px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 9999px;
+  background-color: #fff;
+  color: #000000;
+  width: var(--container_width);
+  overflow: hidden;
+  border: 1px solid rgba(53, 52, 52, 0.226);
+}
+
+.user-mood-radio-input label {
+  width: 100%;
+  padding: 10px;
+  /* cursor: pointer; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  font-weight: 600;
+  letter-spacing: -1px;
+  font-size: 14px;
+}
+
+.user-selection {
+  display: none;
+  position: absolute;
+  height: 100%;
+  width: calc(var(--container_width) / 5);
+  z-index: 0;
+  left: 0;
+  top: 0;
+  transition: 0.15s ease;
+}
+
+.user-mood-radio-input label:has(input:checked) {
+  color: #fff;
+}
+
+.user-mood-radio-input label:has(input:checked) ~ .user-selection {
+  background-color: var(--primary);
+  display: inline-block;
+}
+
+.user-mood-radio-input label:nth-child(1):has(input:checked) ~ .user-selection {
+  transform: translateX(calc(var(--container_width) * 0 / 5));
+}
+
+.user-mood-radio-input label:nth-child(2):has(input:checked) ~ .user-selection {
+  transform: translateX(calc(var(--container_width) * 1 / 5));
+}
+
+.user-mood-radio-input label:nth-child(3):has(input:checked) ~ .user-selection {
+  transform: translateX(calc(var(--container_width) * 2 / 5));
+}
+
+.user-mood-radio-input label:nth-child(4):has(input:checked) ~ .user-selection {
+  transform: translateX(calc(var(--container_width) * 3 / 5));
+}
+
+.user-mood-radio-input label:nth-child(5):has(input:checked) ~ .user-selection {
+  transform: translateX(calc(var(--container_width) * 4 / 5));
+}
+
+.status-select {
+  -webkit-appearance: none;
+  padding: 10px;
+  border-radius: 5px;
+  width: auto;
+  background-color: var(--primary);
+  border: none;
+  position: relative;
+  outline: none;
+}
+
+.status-btn {
+  background-color: var(--primary);
+  border: solid 2px var(--primary);
+  width: 100%;
+  padding: 1rem 0;
+  border-radius: 99999px;
+  transition: all 100ms ease-out;
+  cursor: pointer;
+}
+
+.status-btn:hover {
+  background-color: var(--white);
+  color: var(--primary);
+}
+
+.user-status-message-container textarea {
+  height: 100%;
+  width: 100%;
+  resize: none;
+  background-color: var(--white);
+  color: var(--black);
+  border: none;
+  outline: none;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+}
+
+
+.user-status-message-container textarea::-webkit-scrollbar {
+  display: none;
+}
+
+.select-arrow {
+}
+
+.status-dropdwn-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: auto;
+}
+
+.status-dropdwn-container i {
+  color: var(--lighter);
+}

@@ -1,0 +1,115 @@
+.pfp-main-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
+  width: 266px;
+}
+
+.default-pfp {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  height: 50%;
+  min-height: 200px;
+  aspect-ratio: 1 / 1;
+  border-radius: 999999px;
+  overflow: hidden;
+  border: solid var(--primary) 5px;
+}
+
+.default-pfp p {
+  color: var(--dark);
+  font-size: 4rem;
+} 
+
+.pfp {
+  background-color: white;
+  height: 50%;
+  min-height: 250px;
+  aspect-ratio: 1 / 1;
+  border-radius: 999999px;
+  overflow: hidden;
+  border: solid var(--primary) 5px;
+}
+
+.pfp img {
+  width: 100%;
+  height: auto;
+}
+
+.setting-btn {
+  background-color: var(--primary);
+  border: solid 2px var(--primary);
+  width: 100%;
+  padding: 1rem 0;
+  border-radius: 99999px;
+  transition: all 100ms ease-out;
+  cursor: pointer;
+}
+
+.upload-btn {
+  background-color: var(--primary);
+  border: solid 2px var(--primary);
+  width: 100%;
+  padding: 1rem 0;
+  border-radius: 99999px;
+  transition: all 100ms ease-out;
+  cursor: pointer;
+}
+
+.upload-btn:hover {
+  background-color: transparent;
+  color: var(--primary);
+}
+
+.upload-btn:disabled:hover {
+  background-color: var(--primary);
+  border: solid 2px var(--primary);
+  width: 100%;
+  padding: 1rem 0;
+  border-radius: 99999px;
+  transition: all 100ms ease-out;
+  color: var(--light);
+}
+
+.upload-btn:disabled {
+  cursor: auto;
+}
+
+.setting-btn:hover {
+  background-color: transparent;
+  color: var(--primary);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--primary);
+  border: solid 2px var(--primary);
+  width: 100%;
+  padding: 1rem 0;
+  border-radius: 99999px;
+  transition: all 100ms ease-out;
+  cursor: pointer;
+}
+
+.custom-file-upload:hover {
+  background-color: transparent;
+  color: var(--primary);
+}
+
+.pfp-error-container {
+  border: solid var(--dark) 3px;
+  color: var(--darker);
+  border-radius: 10px;
+  padding: 10px;
+}

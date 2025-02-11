@@ -1,0 +1,42 @@
+.living-room-chat-window-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: var(--offwhite);
+    border-radius: 0 0 10px 10px;
+    position: relative;
+    box-shadow: inset 0px 10px 26px -3px rgba(0,0,0,0.1);
+}
+
+.living-room-info-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+}
+
+#livingroom-message-input {
+    width: 50%;
+}
+
+.living-room-info-text-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    width: auto;
+    height: 100%;
+    padding: 1rem 0;
+    color: var(--black);
+}
+
+.living-room-info-text-container h2 {
+    font-size: 1.5rem;
+
+}

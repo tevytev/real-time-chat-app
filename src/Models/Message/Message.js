@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { v4: uuidv4 } = require("uuid");
 
 const messageSchema = new mongoose.Schema({
   content: {
@@ -14,9 +13,13 @@ const messageSchema = new mongoose.Schema({
   room: {
     type: mongoose.Schema.Types.ObjectId, // Reference to room's id
     ref: "Room", // Name of the Room model
-    required: true, // Every message must be associated with a room
+  },
+  livingRoom: {
+    type: mongoose.Schema.Types.ObjectId, // Reference to living room's id
+    ref: "LivingRoom", // Name of the Living Room model
   },
   dateCreated: { type: Date, default: Date.now },
+  readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] // Read by array containing which users have read the message
 });
 
 const Message = mongoose.model("Message", messageSchema);

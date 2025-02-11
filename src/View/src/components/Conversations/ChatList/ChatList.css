@@ -1,0 +1,31 @@
+.chat-list-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 30%;
+    height: 100%;
+    background-color: var(--white);
+    border-radius: 0 0 10px 0;
+}
+
+.chat-list-container ul::-webkit-scrollbar {
+    display: none;
+}
+
+.chat-list-container ul {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-end;
+    width: 100%;
+    background-color: var(--offwhite);
+    overflow-y: scroll;
+    text-align: center;
+}
+
+.no-chat-text {
+    width: 100%;
+    color: var(--black);
+    padding: 1rem;
+}

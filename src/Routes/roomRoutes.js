@@ -1,6 +1,6 @@
 const express = require("express");
 const { verifyAccessToken } = require("../Middleware/AuthMiddleware/authMiddleware");
-const { createRoom, getAllRooms, getActiveRoom } = require("../Controllers/RoomControllers/RoomController");
+const { createRoom, getAllRooms, getActiveRoomUsers, getLivingRommActiveUsers } = require("../Controllers/RoomControllers/RoomController");
 
 const router = express.Router();
 
@@ -9,7 +9,8 @@ router.use(verifyAccessToken);
 
 router.post("/", createRoom);
 router.get("/all", getAllRooms);
-router.get("/:roomId", getActiveRoom);
+router.get("/:roomId", getActiveRoomUsers);
+router.get("/livingRoom/:livingRoomId", getLivingRommActiveUsers);
 
 
 module.exports = router;

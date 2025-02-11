@@ -1,15 +1,14 @@
 const express = require("express");
 const { Room } = require("../../Models/Room/Room");
-const { User } = require("../../Models/User/User"); 
+const { User } = require("../../Models/User/User");
+const { LivingRoom } = require("../../Models/LivingRoom/LivingRoom");
 
 const createRoom = async (req, res) => {
   const members = req.body.members;
 
   try {
     // Create new room
-    const room = new Room({
-      groupChat: false,
-    });
+    const room = new Room({});
 
     // Push member ids into new rooms "members" schema
     members.forEach((memberId) => {
@@ -29,20 +28,19 @@ const deleteRoom = async (req, res) => {
   
 }
 
-const getActiveRoom = async (req, res) => {
-  const { roomId } = req.params;
+const getActiveRoomUsers = async (req, res) => {
   const { id } = req.user;
+  const { roomId } = req.params;
 
   const users = [];
 
-
   try {
-
     // Find active room
     const room = await Room.findById(roomId).exec();
 
-    // Add each user in the room to array to send back in response
+    // Push each room member in room to "users" array to send to client
     for (let i = 0; i < room.members.length; i++) {
+      if (id === room.members[i].toHexString()) continue;
       const user = await User.findById(room.members[i]);
       users.push(user);
     }
@@ -50,7 +48,7 @@ const getActiveRoom = async (req, res) => {
     res.status(200).json({ users: users });
 
   } catch (error) {
-    
+    console.log();
   }
 }
 
@@ -71,9 +69,34 @@ const getAllRooms = async (req, res) => {
   }
 };
 
+const getLivingRommActiveUsers = async (req, res) => {
+  const { id } = req.user;
+  const { livingRoomId } = req.params;
+
+  const users = [];
+
+  try {
+    // Find family group chat
+    const familyGroupChat = await LivingRoom.findById(livingRoomId).exec();
+
+    // Push each family member in group chat to "users" array to send to client
+    for (let i = 0; i < familyGroupChat.members.length; i++) {
+      if (id === familyGroupChat.members[i].toHexString()) continue;
+      const user = await User.findById(familyGroupChat.members[i]);
+      users.push(user);
+    }
+
+    res.status(200).json({ users: users });
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 
 module.exports = {
     createRoom,
     getAllRooms,
-    getActiveRoom
+    getActiveRoomUsers,
+    getLivingRommActiveUsers
 }

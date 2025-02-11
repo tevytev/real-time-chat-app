@@ -15,7 +15,42 @@
   height: 30px;
   aspect-ratio: 1 / 1;
   border-radius: 100px;
+  overflow: hidden;
+}
 
+.message-pfp img {
+  width: 100%;
+  height: auto;
+}
+
+.recieved-message-body-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 5px;
+  width: auto;
+  /* border: solid blue; */
+  max-width: 50%;
+  color: var(--black);
+  font-weight: 300;
+}
+
+.group-message-name {
+  font-size: .8rem;
+}
+
+.recieved-livingRoom-message-body {
+  height: auto;
+  background-color: var(--primary);
+  color: var(--white);
+  padding: 1rem;
+  border-radius: 5px 20px 20px 20px;
+  word-wrap: break-word;
+  margin-right: auto;
+  margin-bottom: 1rem;
+  text-align: left;
+  position: relative;
 }
 
 .recieved-message-body {

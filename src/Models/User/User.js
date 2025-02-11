@@ -2,10 +2,13 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
-    username: {
+    firstName: {
       type: String,
       required: true,
-      unique: true,
+    },
+    lastName: {
+      type: String,
+      required: true
     },
     email: {
       type: String,
@@ -21,7 +24,9 @@ const userSchema = new mongoose.Schema({
     family: {
       type: mongoose.Schema.Types.ObjectId, // Reference to Family's id
       ref: "Family", // Name of the family model
-
+    },
+    profilePic: {
+      type: String,
     },
     dateCreated: { type: Date, default: Date.now },
 });
