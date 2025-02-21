@@ -4,18 +4,17 @@ const { User } = require("../../Models/User/User");
 const { Room } = require("../../Models/Room/Room");
 const { Message } = require("../../Models/Message/Message");
 const { Status } = require("../../Models/Status/Status");
-const { LivingRoom } = require("../../Models/LivingRoom/LivingRoom")
+const { LivingRoom } = require("../../Models/LivingRoom/LivingRoom");
 
 const createFamily = async (req, res) => {
   const { id } = req.user;
-  const { familyAccessCode, familyName } = req.body;
+  const { familyName } = req.body;
 
   try {
     // Create new family
     const family = new Family({
-      familyAccessCode,
       familyName,
-      creator: id
+      creator: id,
     });
 
     // Push family creator to family "members" schema and save family to database
@@ -24,7 +23,7 @@ const createFamily = async (req, res) => {
 
     // Create new family groupchat
     const familyGroupChat = new LivingRoom({
-      family: family._id
+      family: family._id,
     });
 
     // Push family creator to the family groupchat "members" schema and save to database
@@ -57,16 +56,58 @@ const getFamily = async (req, res) => {
     // Find family
     const family = await Family.findById(familyId).exec();
 
-     // Find family group chat 
-     const familyGroupChat = await LivingRoom.findOne({
-      family: family._id
+    // Find family group chat
+    const familyGroupChat = await LivingRoom.findOne({
+      family: family._id,
     });
 
     // Convert family to an object to append family group chat ID
     const familyToSend = family.toObject();
     familyToSend.livingRoomId = familyGroupChat._id;
-    
+
     res.status(200).json(familyToSend);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getFamilyMembers = async (req, res) => {
+  const { id } = req.user;
+  const { familyId } = req.params;
+
+  try {
+    // Find family by Id
+    const family = await Family.findOne({
+      _id: familyId,
+    });
+
+    // If family is found, send family members array to client
+    if (family) {
+      const members = [];
+
+      // Iterate through family members in order to push user info to members array
+      for (let i = 0; i < family.members.length; i++) {
+        // Convert ObjectId into HexString to compare to user Id
+        const numberFromObjectId = family.members[i].toHexString();
+
+        // skip users id
+        if (numberFromObjectId === id) continue;
+
+        // Look up user info
+        const user = await User.findOne({
+          _id: family.members[i],
+        });
+
+        let memberObj = {
+          firstName: user.firstName,
+          memberId: user._id,
+        };
+
+        members.push(memberObj);
+      }
+
+      res.status(200).json(members);
+    }
   } catch (error) {
     console.log(error);
   }
@@ -85,6 +126,7 @@ const joinFamily = async (req, res) => {
     // If user submitted access code matches family access code push user id to family members
 
     if (family) {
+      if (family.members.includes(id)) return res.status(400).json({ message: "you are already in the family" });
       family.members.push(id);
       await family.save();
 
@@ -113,11 +155,11 @@ const joinFamily = async (req, res) => {
 
         // Save room to database
         room.save();
-      };
+      }
 
-      // Find family group chat 
+      // Find family group chat
       const familyGroupChat = await LivingRoom.findOne({
-        family: family._id
+        family: family._id,
       });
 
       // Push user to "members" schema and save to database
@@ -156,8 +198,8 @@ const leaveFamily = async (req, res) => {
         console.error("error removing comment", error);
       });
 
-      // Find and update family group chat members array
-    const familyGroupChat = await LivingRoom.findByIdAndUpdate(
+    // Find and update family group chat members array
+    const familyGroupChat = await LivingRoom.findOneAndUpdate(
       { family: familyId },
       { $pull: { members: id } }, // Pull the memberId out of the members array
       { new: true } // `new: true` returns the updated document
@@ -170,11 +212,24 @@ const leaveFamily = async (req, res) => {
       });
 
     // Find and update user's family field
-    const updatedUser = await User.findOneAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       { _id: id }, // Find user with matching userId
       { family: null }, // update family ID to null
       { new: true } // Return the updated user
     );
+    
+    // If user is the family creator, pass down creator priviledges to next user in line
+    const newFamily = await Family.findById(familyId);
+    if (id === newFamily.creator.toHexString() && newFamily.members.length > 0) {
+      newFamily.creator = newFamily.members[0];
+      await newFamily.save();
+    };
+
+    // If there are no more members in the family, delete family and living room from database
+    if (newFamily.members.length === 0) {
+      await Family.deleteOne({ _id: familyId });
+      await LivingRoom.deleteOne({ family: familyId });
+    } 
 
     // Delete all of the user's messages and rooms
     await Message.deleteMany({ user: id });
@@ -198,7 +253,6 @@ const getfamilyStatus = async (req, res) => {
 
     // Loop through members array to build array
     for (let i = 0; i < members.length; i++) {
-
       // If userId matching current user skip iteration
       if (id === members[i].toHexString()) continue;
 
@@ -207,11 +261,11 @@ const getfamilyStatus = async (req, res) => {
 
       // Query room for current user and current family member
       const room = await Room.find({
-        members: { $all: [id, members[i].toHexString()] }
+        members: { $all: [id, members[i].toHexString()] },
       });
 
       console.log(room[0]._id);
-      
+
       // Convert status to an object to append more essential information
       const statusToPush = status.toObject();
 
@@ -227,16 +281,18 @@ const getfamilyStatus = async (req, res) => {
     }
 
     res.status(200).json(statusArray);
-    
   } catch (error) {
     console.log(error);
   }
-}
+};
+
+const editFamilyName = async () => {};
 
 module.exports = {
   createFamily,
   getFamily,
   joinFamily,
   leaveFamily,
-  getfamilyStatus
+  getfamilyStatus,
+  getFamilyMembers,
 };

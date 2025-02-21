@@ -1,7 +1,10 @@
-
-
+import { useContext } from "react";
+import { UserContext } from "../../../routes/userContext/UserContext";
+import "./FamilyStatusCard.css";
 
 export default function FamilyStatusCard(props) {
+
+  const { family } = useContext(UserContext);
 
     const { mood, feelings, availability, thoughts, firstName, userId, roomId, setActiveTab, setActiveRoomId, profilePic } = props;
 
@@ -17,6 +20,9 @@ export default function FamilyStatusCard(props) {
             <div className={profilePic ? "status-pfp" : "default-status-pfp"}>{profilePic ? <img src={profilePic} alt="user-profile-pic" /> : firstName[0]}</div>
             <div className="status-name-container">
               <p>{firstName}</p>
+              {userId === family.creator ? <div className="status-creator-accent-container">
+                <i class="fa-solid fa-star"></i>
+              </div> : <></>}
             </div>
           </div>
           <div className="status-bottom-container">

@@ -55,3 +55,66 @@
     width: 266px;
     /* border: solid blue; */
 }
+
+.setting-sector-container h3 {
+    color: var(--black);
+    font-size: 1.5rem;
+}
+
+.setting-field-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+}
+
+.setting-field-container label {
+    color: var(--black);
+}
+
+.setting-field {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: var(--light);
+    padding: 1rem 0 1rem 1rem;
+    border-radius: 5px;
+    /* margin-bottom: 1rem; */
+    color: var(--darker);
+    height: 50px;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    position: relative;
+}
+
+
+.setting-field::-webkit-scrollbar {
+    display: none;
+  }
+  
+
+.setting-sector-container form  {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+}
+
+.setting-sector-container form label {
+    color: var(--black);
+}
+
+.setting-sector-container form input {
+    background-color: var(--light);
+    padding: 1rem;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    color: var(--darker);
+}
+
+.setting-sector-container form input::placeholder {
+    color: var(--dark);
+}

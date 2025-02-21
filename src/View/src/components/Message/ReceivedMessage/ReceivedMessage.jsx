@@ -21,7 +21,7 @@ export default function ReceivedMessage(props) {
     return (
       <>
         <div className="message-container">
-          <div className="message-pfp">{username[0].toUpperCase()}</div>
+          <div className="message-pfp">{pfp ? <img src={pfp} alt="" /> : username[0].toUpperCase()}</div>
           <div className="recieved-message-body">
             <p>{text}</p>
             <p className="message-timestamp">{time}</p>

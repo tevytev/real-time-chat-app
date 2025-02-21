@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { UserContext } from "../../../routes/userContext/UserContext";
 import "./UserStatusCard.css";
 import axios from "../../../api/axios";
 const USER_STATUS_URL = "/api/user/"
 
 export default function UserStatusCard(props) {
+
+  const { creator } = useContext(UserContext);
 
   const { user, mood, setMood, feelings, setFeelings, availability, setAvailability, thoughts, setThoughts, edit, setEdit } = props;
 
@@ -80,6 +83,9 @@ export default function UserStatusCard(props) {
             <div className={user.profilePic ? "status-pfp" : "default-status-pfp"}>{user.profilePic ? <img src={user.profilePic} alt="user-profile-pic" /> : user.firstName.slice(0,1)}</div>
             <div className="user-status-name-container">
               <p>{user.firstName}</p>
+              {creator ? <div className="status-creator-accent-container">
+                <i class="fa-solid fa-star"></i>
+              </div> : <></>}
             </div>
           </div>
           <div className="user-status-bottom-container">

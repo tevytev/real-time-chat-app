@@ -8,6 +8,10 @@ import AuthForm from "../../components/AuthForm/AuthForm";
 import LivingRoom from "../../components/LivingRoom/LivingRoom";
 
 export default function Auth() {
+
+  // User context
+  const { user, setUser, family, setFamily, setCreator } = useContext(UserContext);
+
   // navigation function
   const navigate = useNavigate();
 
@@ -16,9 +20,8 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authType, setAuthType] = useState("login");
+  let signInUserId = '';
 
-  // User context
-  const { user, setUser, family, setFamily, setCreator } = useContext(UserContext);
 
   // User login function
   const handleLogin = async (e) => {
@@ -50,6 +53,7 @@ export default function Auth() {
         };
         // Set user state and user local storage for data persistance
         setUser(userData);
+        signInUserId = userData.userId;
         localStorage.setItem("user", JSON.stringify(userData));
         // Fetch user family and then navigate user to dashboard if they already have a family or to the family setup screen if they do not have a family
         if (userData.familyId !== null) {
@@ -128,7 +132,7 @@ export default function Auth() {
 
         setFamily(familyData);
         localStorage.setItem("family", JSON.stringify(familyData));
-        if (familyData.creator === user.userId) setCreator(true);
+        if (familyData.creator === signInUserId) setCreator(true);
       }
       
     } catch (error) {

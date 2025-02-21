@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 
 const familySchema = new mongoose.Schema({
   familyAccessCode: {
-    type: Number,
-    required: true,
+    type: String,
+    unique: true,
+    default: () => uuidv4()
   },
   familyName: {
     type: String,

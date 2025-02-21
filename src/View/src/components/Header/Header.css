@@ -133,3 +133,37 @@
     align-items: center;
     gap: 10px;
 }
+
+.header-logout-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    height: 30px;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1rem;
+    border-radius: 99999px;
+    border: 1px solid var(--lighter);
+    background-color: var(--lighter);
+    color: var(--dark);
+    padding: 1rem 1rem;
+    transition: all 100ms ease-out;
+    cursor: pointer;
+}
+
+.header-logout-btn p {
+    font-size: .8rem;
+}
+
+.header-logout-btn i {
+    font-size: .8rem;
+}
+
+.header-logout-btn:hover {
+    background-color: var(--light);
+    border: 1px solid var(--light);
+
+    /* color: var(--ligher); */
+}

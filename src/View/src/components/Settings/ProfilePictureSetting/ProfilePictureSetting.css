@@ -107,9 +107,17 @@ input[type="file"] {
   color: var(--primary);
 }
 
-.pfp-error-container {
-  border: solid var(--dark) 3px;
+.pfp-msg-container {
+  border: solid var(--darker) 3px;
   color: var(--darker);
   border-radius: 10px;
   padding: 10px;
 }
+
+.pfp-error-container {
+  color: var(--black);
+  border: solid 3px var(--black);
+  border-radius: 10px;
+  padding: 10px;
+}
+

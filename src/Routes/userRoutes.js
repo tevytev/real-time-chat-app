@@ -11,6 +11,7 @@ const {
   getUser,
   getUserStatus,
   updateUserStatus,
+  updateUserInfo
 } = require("../Controllers/UserControllers/UserController");
 const { User } = require("../Models/User/User");
 
@@ -30,6 +31,9 @@ router.use(verifyAccessToken);
 
 // Fetch user information
 router.get("/:userId", getUser);
+
+// Update user info
+router.post("/:userId/edit", updateUserInfo);
 
 // Fetch user status
 router.get("/:userId/status", getUserStatus);

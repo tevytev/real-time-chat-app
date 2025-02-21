@@ -42,8 +42,33 @@ const updateUserStatus = async (req, res) => {
   }
 };
 
+const updateUserInfo = async (req, res) => {
+  const { userId } = req.params;
+  const { firstName, lastName, email } = req.body;
+
+  try {
+
+    const user = await User.findOne({ _id: userId });
+
+    const newUser = await User.findOneAndUpdate(
+      { _id: userId },
+      {
+        firstName: firstName !== "" ? firstName : user.firstName,
+        lastName: lastName !== "" ? lastName : user.lastName,
+        email: email !== "" ? email : user.email,
+      },
+      { new: true }
+    );
+    
+    res.status(200).json(newUser);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   getUser,
   getUserStatus,
   updateUserStatus,
+  updateUserInfo
 };

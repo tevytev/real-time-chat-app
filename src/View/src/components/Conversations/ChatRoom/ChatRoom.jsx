@@ -264,7 +264,7 @@ export default function ChatRoom(props) {
 
                   // Format time without leading zero
                   const formattedTime = `${hours}:${minutes} ${ampm}`;
-
+                  let pfp = activeRoomUsers[0].profilePic;
                   return (
                     <>
                       <ReceivedMessage
@@ -272,6 +272,7 @@ export default function ChatRoom(props) {
                         key={index}
                         time={formattedTime}
                         text={messageObj.content}
+                        pfp={pfp}
                       />
                     </>
                   );

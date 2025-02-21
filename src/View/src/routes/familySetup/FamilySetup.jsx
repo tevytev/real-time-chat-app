@@ -13,7 +13,7 @@ export default function FamilySetup() {
   const [startOrJoin, setStartOrJoin] = useState(null);
 
   // User context
-  const { user, setUser, family, setFamily } = useContext(UserContext);
+  const { user, setUser, family, setFamily, setCreator } = useContext(UserContext);
 
   useEffect(() => {
     if (!user.userId) navigate("/register")
@@ -26,10 +26,12 @@ export default function FamilySetup() {
 
     // If user wants to start a family, create family and set UserContext family to returned new family object
     if (startOrJoin === "start") {
+
       const startFormData = {
         familyAccessCode: familyAccessCode,
         familyName: familyName,
       };
+
       try {
         const response = await axios.post(
           FAMILY_URL,
@@ -49,8 +51,10 @@ export default function FamilySetup() {
             familyName: response.data.familyName,
             livingRoomId: response.data.livingRoomId,
             members: response.data.members,
+            creator: response.data.creator
           };
 
+          setCreator(true);
           setFamily(familyData);
           localStorage.setItem("family", JSON.stringify(familyData));
           navigate("/home");
@@ -83,10 +87,12 @@ export default function FamilySetup() {
             familyName: response.data.familyName,
             livingRoomId: response.data.livingRoomId,
             members: response.data.members,
+            creator: response.data.creator
           };
 
           setFamily(familyData);
           localStorage.setItem("family", JSON.stringify(familyData));
+          setCreator(false);
           navigate("/home");
         }
       } catch (error) {
@@ -116,6 +122,7 @@ export default function FamilySetup() {
             familyName: response.data.familyName,
             livingRoomId: response.data.livingRoomId,
             members: response.data.members,
+            creator: response.data.creator
           };
 
           setFamily(familyData);

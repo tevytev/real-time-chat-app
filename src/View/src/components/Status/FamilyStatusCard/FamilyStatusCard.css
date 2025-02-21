@@ -1,0 +1,16 @@
+.status-creator-accent-container {
+    position: absolute;
+    right: -25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 9999999px;
+    background-color: var(--dark);
+    padding: 5px;
+    aspect-ratio: 1 / 1;
+    color: var(--white);
+}
+
+.status-creator-accent-container i {
+    font-size: .7rem;
+}

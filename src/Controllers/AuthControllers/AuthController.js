@@ -217,9 +217,36 @@ const refresh = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  const { userId } = req.params;
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+
+    // Find the user by email
+    const user = await User.findOne({ _id: userId });
+
+    // Compare the provided password with the stored hashed password
+    const isMatch = await user.comparePassword(oldPassword);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Success" });
+    
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   refresh,
+  changePassword
 };

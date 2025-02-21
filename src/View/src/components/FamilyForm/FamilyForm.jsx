@@ -84,7 +84,7 @@ export default function FamilyForm(props) {
               }}
               className="auth-btn"
             >
-              Start family
+              Start New Family
             </button>
             <button
               onClick={(e) => {
@@ -93,7 +93,7 @@ export default function FamilyForm(props) {
               }}
               className="auth-btn"
             >
-              Join family
+              Join Family
             </button>
           </form>
         </div>
