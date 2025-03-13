@@ -63,7 +63,7 @@
         transition: 100ms ease-out all;
         position: absolute;
         right: 0px;
-        z-index: 2;
+        z-index: 4;
     }
   }
 

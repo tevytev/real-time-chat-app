@@ -40,7 +40,7 @@
     background-color: #00000038;
     border-radius: 0 0 10px 10px;
     backdrop-filter: blur(1px);
-    z-index: 1;
+    z-index: 3;
 }
 
 .chat-backdrop-hidden {

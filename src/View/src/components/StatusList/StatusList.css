@@ -22,7 +22,8 @@
   min-height: 80px;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
 
 .status-list-header-container h2 {
@@ -153,7 +154,6 @@
   justify-content: flex-start;
   align-items: center;
   gap: 1rem;
-  /* border: solid red; */
   height: 100%;
   width: 100%;
   padding: 1rem 1rem;
@@ -163,7 +163,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* border: solid red; */
   width: 100%;
   color: black;
   font-weight: 600;
@@ -176,7 +175,6 @@
   align-items: flex-start;
   gap: 1rem;
   width: 100%;
-  /* border: solid red; */
   color: var(--black);
 }
 
