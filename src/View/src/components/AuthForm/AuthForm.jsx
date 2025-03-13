@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./AuthForm.css";
+const NAME_REGEX = /^[A-Z][a-zA-Z-' ]{1,49}$/;
+const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
+const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
 export default function AuthForm(props) {
   const {
@@ -13,10 +16,83 @@ export default function AuthForm(props) {
     setEmail,
     password,
     setPassword,
+    confirmPassword,
+    setConfirmPassword,
     handleLogin,
     handleSignup,
     clearInputs,
+    validFirstName,
+    setValidFirstName,
+    validLastName,
+    setValidLastName,
+    validEmail,
+    setValidEmail,
+    validPassword,
+    setValidPassword,
+    validConfirmPassword,
+    setValidConfirmPassword,
+    formStarted,
+    setFormStarted,
+    errorMsg,
+    setErrorMsg
   } = props;
+
+  const firstNameRef = useRef();
+  const lastNameRef = useRef();
+  const emailRef = useRef();
+  const passwordRef = useRef();
+  const confirmPasswordRef = useRef();
+
+  // Name validation
+  useEffect(() => {
+    const firstNameResult = NAME_REGEX.test(firstName);
+    setValidFirstName(firstNameResult);
+
+    const lastNameResult = NAME_REGEX.test(lastName);
+    setValidLastName(lastNameResult);
+  }, [firstName, lastName]);
+
+  // Email validation
+  useEffect(() => {
+    const result = EMAIL_REGEX.test(email);
+    setValidEmail(result);
+  }, [email]);
+
+  // Password validation
+  useEffect(() => {
+    const result = PWD_REGEX.test(password);
+    setValidPassword(result);
+    const match = password === confirmPassword;
+    setValidConfirmPassword(match);
+  }, [password, confirmPassword]);
+
+  // Form started validation
+  useEffect(() => {
+    
+    if (firstName || lastName || email || password || confirmPassword) setFormStarted(true);
+    else setFormStarted(false);
+
+  }, [firstName, lastName, email, password, confirmPassword]);
+
+  const handleSignUpErrorRef = (e) => {
+    e.preventDefault();
+
+    if (!firstName || !lastName || !email || !password || !confirmPassword) setErrorMsg("Please complete all fields");
+    else setErrorMsg("");
+
+    if (!validFirstName) firstNameRef.current.focus();
+    else if (!validLastName) lastNameRef.current.focus();
+    else if (!validEmail) emailRef.current.focus();
+    else if (!validPassword) passwordRef.current.focus();
+    else if (!validConfirmPassword) confirmPasswordRef.current.focus();
+  };
+
+  const handleLoginErrorRef = (e) => {
+    e.preventDefault();
+    setErrorMsg("Please complete all fields");
+    if (!email) emailRef.current.focus();
+    else if (!password) passwordRef.current.focus();
+  }
 
   if (authType === "login") {
     return (
@@ -86,6 +162,7 @@ export default function AuthForm(props) {
             ></path>{" "}
           </svg>
           <h1 className="auth-header">Login</h1>
+          <p className={errorMsg ? "auth-top-error-msg" : "hidden"}>{errorMsg}</p>
           <form action="">
             <input
               value={email}
@@ -95,6 +172,7 @@ export default function AuthForm(props) {
               className="auth-input"
               placeholder="Email"
               type="text"
+              ref={emailRef}
             />
             <input
               value={password}
@@ -105,8 +183,9 @@ export default function AuthForm(props) {
               placeholder="Password"
               type="password"
               autoComplete="on"
+              ref={passwordRef}
             />
-            <button onClick={handleLogin} className="auth-btn" id="login-btn">
+            <button onClick={!email || !password ? handleLoginErrorRef : handleLogin} className="auth-btn" id="login-btn">
               Login
             </button>
           </form>
@@ -199,6 +278,7 @@ export default function AuthForm(props) {
             ></path>{" "}
           </svg>
           <h1 className="auth-header">Signup</h1>
+          <p className={errorMsg ? "auth-top-error-msg" : "hidden"}>{errorMsg}</p>
           <form action="">
             <input
               value={firstName}
@@ -208,7 +288,16 @@ export default function AuthForm(props) {
               className="auth-input"
               placeholder="First Name"
               type="text"
+              ref={firstNameRef}
             />
+            <p
+            id="firstnamenote"
+            className={firstName && !validFirstName ? "auth-error-message" : "hidden"}
+            >
+              <i class="fa-solid fa-circle-info"></i>
+              First character must be uppercase <br />
+              No invalid charcters (ex. @, !, ?, $, % etc...)
+            </p>
             <input
               value={lastName}
               onChange={(e) => {
@@ -217,7 +306,16 @@ export default function AuthForm(props) {
               className="auth-input"
               placeholder="Last Name"
               type="text"
+              ref={lastNameRef}
             />
+            <p
+            id="lastnamenote"
+            className={lastName && !validLastName ? "auth-error-message" : "hidden"}
+            >
+              <i class="fa-solid fa-circle-info"></i>
+              First character must be uppercase <br />
+              No invalid charcters (ex. @, !, ?, $, % etc...)
+            </p>
             <input
               value={email}
               onChange={(e) => {
@@ -226,7 +324,16 @@ export default function AuthForm(props) {
               className="auth-input"
               placeholder="Email"
               type="text"
+              ref={emailRef}
             />
+            <p
+            id="emailnote"
+            className={email && !validEmail ? "auth-error-message" : "hidden"}
+            >
+              <i class="fa-solid fa-circle-info"></i>
+              Must be a valid email address <br />
+              (ex. johndoe@example.com)
+            </p>
             <input
               value={password}
               onChange={(e) => {
@@ -236,10 +343,37 @@ export default function AuthForm(props) {
               placeholder="Password"
               type="password"
               autoComplete="on"
+              ref={passwordRef}
             />
-            <button onClick={handleSignup} id="login-btn">Signup</button>
-          </form>
-          <small>
+            <p
+            id="pwdenote"
+            className={password && !validPassword ? "auth-error-message" : "hidden"}
+            >
+              <i class="fa-solid fa-circle-info"></i>
+              8 to 24 characters <br />
+              Must include uppercase and lowercase letters, a number, and a special character. <br />
+              Allowed special characters: !, @, #, $, %
+            </p>
+            <input
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+              }}
+              className="auth-input"
+              placeholder="Confirm Password"
+              type="password"
+              autoComplete="on"
+              ref={confirmPasswordRef}
+            />
+             <p
+            id="confirmnote"
+            className={confirmPassword && !validConfirmPassword ? "auth-error-message" : "hidden"}
+            >
+              <i class="fa-solid fa-circle-info"></i>
+              Must match the first password input field.
+            </p>
+            <button onClick={validFirstName && validLastName && validEmail && validPassword && validConfirmPassword ? handleSignup : handleSignUpErrorRef} id="login-btn">Signup</button>
+            <small>
             <span
               style={{
                 color: "#171717",
@@ -257,6 +391,7 @@ export default function AuthForm(props) {
               Login
             </span>
           </small>
+          </form>
         </div>
       </>
     );

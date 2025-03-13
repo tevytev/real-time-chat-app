@@ -20,7 +20,7 @@ const socket = io("http://localhost:5432/", { transports: ["websocket"] });
 export default function ChatRoom(props) {
   const { activeRoomId, loadingRooms, fetchRooms } = props;
 
-  const { user } = useContext(UserContext);
+  const { user, family, activeTab } = useContext(UserContext);
 
   const [activeRoomUsers, setActiveRoomUsers] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -30,6 +30,12 @@ export default function ChatRoom(props) {
   const [noMoreMessages, setNoMoreMessages] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
+
+  // Message to send states
+  const [imageToSend, setImageToSend] = useState(null);
+  const [messageToSend, setMessageToSend] = useState("");
+
+  const [inputImage, setInputImage] = useState(null);
 
   // Reference to chat window
   const chatWindowRef = useRef(null);
@@ -117,7 +123,6 @@ export default function ChatRoom(props) {
           const filteredUsers = response.data.users.filter((roomUser) => {
             return roomUser._id !== user.userId;
           });
-          console.log(filteredUsers)
           setActiveRoomUsers(filteredUsers);
         }
       } catch (error) {
@@ -179,18 +184,58 @@ export default function ChatRoom(props) {
   }, [newMessages]);
 
   useLayoutEffect(() => {
-    if (chatWindowRef.current) {
-      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+    // if (chatWindowRef.current) {
+    //   chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+    // }
+
+    const scrollToBottom = () => {
+      if (chatWindowRef.current) {
+        chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+      }
+    };
+
+
+    // Set a delay to allow for the render to complete
+  const timeoutId = setTimeout(scrollToBottom, 10);
+
+  return () => clearTimeout(timeoutId); // Cleanup the timeout
+
+  }, [activeRoomUsers, activeRoomId]); // Trigger when messages change
+
+  const handleFileChange = (e) => {
+    const input = document.getElementById("file-upload");
+    const file = input.files[0];
+    const objectURL = URL.createObjectURL(file);
+
+    if (file) {
+      const fileType = ["image/jpeg", "image/png", "image/jpg"];
+
+      if (fileType.includes(file.type)) {
+        // setError("");
+        setInputImage(objectURL);
+        setImageToSend(file);
+      } else {
+        // setError("Error: Please upload a valid image file (JPG, JPEG, PNG)");
+        setInputImage(null);
+        setImageToSend(null);
+      }
     }
-  }, [activeRoomUsers]); // Trigger when messages change
+  };
+
+  const cancelSendImage = (e) => {
+    const input = document.getElementById("file-upload");
+    input.files = null;
+    setInputImage(null);
+    setImageToSend(null);
+  };
 
   // Handle send message
   const handleSendMessage = async (e) => {
-    const input = document.getElementById("message-input");
-    const message = input.value;
+    e.preventDefault();
+    if (!messageToSend) return;
 
     const body = {
-      messageContent: message,
+      messageContent: messageToSend,
     };
 
     try {
@@ -210,12 +255,48 @@ export default function ChatRoom(props) {
         // emit message to all active room users
         socket.emit("sendMessage", activeRoomId, createdMessage);
         // clear input
-        input.value = "";
+        setMessageToSend("");
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  const handleSendImageMessage = async (e) => {
+    e.preventDefault();
+    if (!imageToSend) return;
+
+    // Attach image to body
+    const formData = new FormData();
+    formData.append("image", imageToSend);
+
+    try {
+      
+      const response = await axios.post(
+        `${MESSAGE_URL}createImage/${activeRoomId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 201) {
+        console.log(response)
+        // created message to send to websocket
+        const createdMessage = response.data.message;
+        // emit message to all active room users
+        socket.emit("sendMessage", activeRoomId, createdMessage);
+        // clear input
+        setImageToSend(null);
+        setInputImage(null);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
     fetchRooms();
@@ -228,10 +309,22 @@ export default function ChatRoom(props) {
           <header className="chat-window-header">
             <div className="chat-room-info-container">
               <div className="chat-room-info-pfp">
-                {activeRoomUsers[0].profilePic ? <img src={activeRoomUsers[0].profilePic} alt="" /> : activeRoomUsers[0].firstName[0].toUpperCase()}
+                {activeRoomUsers[0].profilePic ? (
+                  <img src={activeRoomUsers[0].profilePic} alt="" />
+                ) : (
+                  activeRoomUsers[0].firstName[0].toUpperCase()
+                )}
               </div>
               <div className="chat-room-info-text-container">
                 <h2>{activeRoomUsers[0].firstName}</h2>
+                {family.members.includes(activeRoomUsers[0]._id) ? (
+                  <p></p>
+                ) : (
+                  <p>
+                    (Currently not in family){" "}
+                    <i className="fa-solid fa-person-circle-xmark"></i>
+                  </p>
+                )}
               </div>
             </div>
           </header>
@@ -242,12 +335,12 @@ export default function ChatRoom(props) {
           >
             {loadingMoreMessages ? (
               <div className="loading-more-chat-window-scroll-container">
-                <div class="loader"></div>
+                <div className="loader"></div>
               </div>
             ) : null}
             {loadingMessages ? (
               <div className="loading-chat-window-scroll-container">
-                <div class="loader"></div>
+                <div className="loader"></div>
               </div>
             ) : (
               messages.map((messageObj, index) => {
@@ -265,16 +358,16 @@ export default function ChatRoom(props) {
                   // Format time without leading zero
                   const formattedTime = `${hours}:${minutes} ${ampm}`;
                   let pfp = activeRoomUsers[0].profilePic;
+                  let image = messageObj.image ? messageObj.image : null;
                   return (
-                    <>
                       <ReceivedMessage
                         username={activeRoomUsers[0].firstName}
                         key={index}
                         time={formattedTime}
-                        text={messageObj.content}
+                        text={messageObj.content ? messageObj.content : null}
                         pfp={pfp}
+                        image={image}
                       />
-                    </>
                   );
                 } else {
                   const date = new Date(messageObj.dateCreated);
@@ -290,14 +383,14 @@ export default function ChatRoom(props) {
 
                   // Format time without leading zero
                   const formattedTime = `${hours}:${minutes} ${ampm}`;
+                  let image = messageObj.image ? messageObj.image : null;
                   return (
-                    <>
                       <UserMessage
                         key={index}
                         time={formattedTime}
-                        text={messageObj.content}
+                        text={messageObj.content ? messageObj.content : null}
+                        image={image}
                       />
-                    </>
                   );
                 }
               })
@@ -316,16 +409,17 @@ export default function ChatRoom(props) {
 
                 // Format time without leading zero
                 const formattedTime = `${hours}:${minutes} ${ampm}`;
-
+                let pfp = activeRoomUsers[0].profilePic;
+                let image = messageObj.image ? messageObj.image : null;
                 return (
-                  <>
                     <ReceivedMessage
                       username={activeRoomUsers[0].firstName}
                       key={index}
                       time={formattedTime}
-                      text={messageObj.content}
+                      text={messageObj.content ? messageObj.content : null}
+                      pfp={pfp}
+                      image={image}
                     />
-                  </>
                 );
               } else {
                 const date = new Date(messageObj.dateCreated);
@@ -341,28 +435,58 @@ export default function ChatRoom(props) {
 
                 // Format time without leading zero
                 const formattedTime = `${hours}:${minutes} ${ampm}`;
+                let image = messageObj.image ? messageObj.image : null;
                 return (
-                  <>
                     <UserMessage
                       key={index}
                       time={formattedTime}
-                      text={messageObj.content}
+                      text={messageObj.content ? messageObj.content : null}
+                      image={image}
                     />
-                  </>
                 );
               }
             })}
           </div>
-          <div className="chat-window-footer">
-            <textarea
-              id="message-input"
-              placeholder="Type a message"
-              type="text"
+          <form className="chat-window-footer">
+            {imageToSend !== null ? (
+              <>
+                <div className="image-input" id="message-input">
+                  <div onClick={cancelSendImage} className="image-cancel-container"><i className="fa-solid fa-xmark"></i></div>
+                  <img
+                    className="image-to-send"
+                    src={inputImage ? inputImage : null}
+                    alt=""
+                  />
+                </div>
+              </>
+            ) : (
+              <textarea
+                value={messageToSend}
+                onChange={(e) => {
+                  setMessageToSend(e.target.value);
+                }}
+                id="message-input"
+                placeholder="Type a message"
+                type="text"
+              />
+            )}
+            <label htmlFor="file-upload" className={messageToSend ? "message-send-btn disabled-message" : "message-send-btn" } >
+              <i className="fa-solid fa-image"></i>
+            </label>
+            <input
+              disabled={messageToSend ? true : false}
+              onChange={handleFileChange}
+              id="file-upload"
+              type="file"
             />
-            <button onClick={handleSendMessage} className="message-send-btn">
+            <button
+              type="submit"
+              onClick={messageToSend ? handleSendMessage : handleSendImageMessage}
+              className="message-send-btn"
+            >
               <i className="fa-solid fa-paper-plane"></i>
             </button>
-          </div>
+          </form>
         </section>
       </>
     );
@@ -381,6 +505,9 @@ export default function ChatRoom(props) {
           <div className="loading-chat-window-scroll-container"></div>
           <div className="chat-window-footer">
             <textarea placeholder="Type a message" type="text" />
+            <button type="submit" className="message-send-btn">
+              <i className="fa-solid fa-image"></i>
+            </button>
             <button className="message-send-btn">
               <i className="fa-solid fa-paper-plane"></i>
             </button>
@@ -394,12 +521,15 @@ export default function ChatRoom(props) {
         <section className="chat-window-container">
           <header className="chat-window-header">
             <div className="chat-room-info-container">
-              <div className="chat-room-info-text-container"></div>
+              <div className="chat-room-info-text-container"><h2>Choose a room!</h2></div>
             </div>
           </header>
           <div className="loading-chat-window-scroll-container"></div>
           <div className="chat-window-footer">
             <textarea placeholder="Type a message" type="text" />
+            <button type="submit" className="message-send-btn">
+              <i className="fa-solid fa-image"></i>
+            </button>
             <button className="message-send-btn">
               <i className="fa-solid fa-paper-plane"></i>
             </button>

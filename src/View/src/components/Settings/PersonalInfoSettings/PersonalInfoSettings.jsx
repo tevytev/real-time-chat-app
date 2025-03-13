@@ -67,8 +67,6 @@ export default function PersonalInfoSettings(props) {
         }
       );
 
-      console.log(response);
-
       if (response.status === 200) {
         const userData = {
           userId: response.data._id,
@@ -85,13 +83,19 @@ export default function PersonalInfoSettings(props) {
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
         setUpdateInfoActive(false);
-        setSuccessMessage("New info successfully saved!");
+        setSuccessMessage("New info saved successfully!");
         setTimeout(() => {
           setSuccessMessage("");
         }, 5000);
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("family");
+        navigate("/register");
+      }
     }
   };
 
@@ -129,17 +133,24 @@ export default function PersonalInfoSettings(props) {
         setOldPassword("");
         setNewPassword("");
         setChangePasswordActive(false);
-        setSuccessMessage("New password successfully saved!");
+        setSuccessMessage("New password saved successfully!");
         setTimeout(() => {
           setSuccessMessage("");
         }, 5000);
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("family");
+        navigate("/register");
+      }
     }
   };
 
-  const handleChangePasswordActive = () => setChangePasswordActive(!changePasswordActive);
+  const handleChangePasswordActive = () =>
+    setChangePasswordActive(!changePasswordActive);
 
   const handleUpdateInfoActive = () => setUpdateInfoActive(!updateInfoActive);
 
@@ -251,6 +262,8 @@ export default function PersonalInfoSettings(props) {
                   onChange={(e) => setNewPassword(e.target.value)}
                   type="password"
                 />
+              </div>
+              <div className="setting-input-container">
                 <label htmlFor="">Confirm new password</label>
                 <input
                   value={confirmPassword}

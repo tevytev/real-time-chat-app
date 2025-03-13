@@ -16,9 +16,6 @@ export default function StatusList(props) {
   useEffect(() => {
     const fetchStatusCards = async () => {
       setLoadingCards(true);
-      const body = {
-        members: family.members,
-      };
 
       try {
         const response = await axios.get(
@@ -37,7 +34,13 @@ export default function StatusList(props) {
           setLoadingCards(false);
         }
       } catch (error) {
-        console.log(error);
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          localStorage.removeItem("user");
+          localStorage.removeItem("family");
+          navigate("/register");
+        }
       }
     };
 
@@ -52,7 +55,7 @@ export default function StatusList(props) {
             <h2></h2>
           </div>
           <div className="loading-status-list-container">
-          <div class="loader"></div>
+          <div className="loader"></div>
           </div>
         </section>
       </>
@@ -78,6 +81,7 @@ export default function StatusList(props) {
                   userId={status.user}
                   roomId={status.roomId}
                   profilePic={status.profilePic}
+                  key={`status-list-item-${status.user}`}
                 />
               );
             })}
@@ -90,7 +94,7 @@ export default function StatusList(props) {
       <>
         <section className="status-list-outer-container">
           <div className="status-list-header-container">
-            <h2>Cheathams Family</h2>
+            <h2>{family.familyName} Family</h2>
           </div>
           <div className="empty-status-list-container">
             <p>No status' to show, you need family members.</p>

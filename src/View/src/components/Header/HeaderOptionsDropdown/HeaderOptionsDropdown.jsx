@@ -33,8 +33,7 @@ const handleLogout = async (e) => {
     <>
       <div className="header-options-container">
         <ul>
-            <li className="top-option">Change Profile Picture</li>
-            <li onClick={handleLogout} className="bottom-option">Logout</li>
+            <li onClick={handleLogout} className="option">Logout <i className="fa-solid fa-arrow-right-from-bracket"></i></li>
         </ul>
       </div>
     </>

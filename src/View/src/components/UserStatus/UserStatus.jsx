@@ -45,7 +45,7 @@ export default function UserStatus() {
 
   return (
     <>
-      <section className="user-status-container">
+      <section id="user-status" className="user-status-container">
         <div className="user-status-header-container">
           <h2>YOUR STATUS</h2>
         </div>

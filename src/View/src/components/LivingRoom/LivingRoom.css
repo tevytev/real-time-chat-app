@@ -6,7 +6,6 @@
     width: 100%;
     height: 100%;
     background-color: var(--offwhite);
-    border-radius: 0 0 10px 10px;
     position: relative;
     box-shadow: inset 0px 10px 26px -3px rgba(0,0,0,0.1);
 }
@@ -39,4 +38,10 @@
 .living-room-info-text-container h2 {
     font-size: 1.5rem;
 
+}
+
+@media screen and (max-width: 1024px) {
+    #livingroom-message-input {
+        width: 100%;
+    }
 }

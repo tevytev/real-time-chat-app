@@ -9,14 +9,17 @@ export default function FamilySetup() {
   const navigate = useNavigate();
 
   const [familyName, setFamilyName] = useState("");
+  const [validFamilyName, setValidFamilyName] = useState(false);
   const [familyAccessCode, setFamilyAccessCode] = useState("");
   const [startOrJoin, setStartOrJoin] = useState(null);
+
+  const [errorMsg, setErrorMsg] = useState("");
 
   // User context
   const { user, setUser, family, setFamily, setCreator } = useContext(UserContext);
 
   useEffect(() => {
-    if (!user.userId) navigate("/register")
+    if (!user.userId) navigate("/register");
 
     return () => {};
   }, [user]);
@@ -145,6 +148,8 @@ export default function FamilySetup() {
         familyAccessCode={familyAccessCode}
         setFamilyAccessCode={setFamilyAccessCode}
         fetchFamily={fetchFamily}
+        validFamilyName={validFamilyName}
+        setValidFamilyName={setValidFamilyName}
       />
     </>
   );

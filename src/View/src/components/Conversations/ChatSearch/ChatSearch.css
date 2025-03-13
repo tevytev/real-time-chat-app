@@ -36,3 +36,9 @@
 .chat-search-bar input:focus {
     outline: none;
 }
+
+.clear-search {
+    font-size: 1.3rem;
+    color: var(--darker);
+    cursor: pointer;
+}

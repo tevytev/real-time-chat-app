@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const messageSchema = new mongoose.Schema({
   content: {
     type: String,
-    required: true,
+  },
+  image: {
+    type: String,
   },
   user: {
     type: mongoose.Schema.Types.ObjectId, // Reference to User's id

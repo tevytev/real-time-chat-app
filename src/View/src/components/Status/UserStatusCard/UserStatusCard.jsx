@@ -49,7 +49,13 @@ export default function UserStatusCard(props) {
         setEdit(false);
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("family");
+        navigate("/register");
+      }
     }
   }
 
@@ -84,7 +90,7 @@ export default function UserStatusCard(props) {
             <div className="user-status-name-container">
               <p>{user.firstName}</p>
               {creator ? <div className="status-creator-accent-container">
-                <i class="fa-solid fa-star"></i>
+                <i className="fa-solid fa-star"></i>
               </div> : <></>}
             </div>
           </div>
@@ -109,7 +115,7 @@ export default function UserStatusCard(props) {
                   }}
                 />
                 <span>
-                  <i class="fa-regular fa-face-frown"></i>
+                  <i className="fa-regular fa-face-frown"></i>
                 </span>
               </label>
               <label
@@ -127,7 +133,7 @@ export default function UserStatusCard(props) {
                   }}
                 />
                 <span>
-                  <i class="fa-regular fa-face-frown-open"></i>
+                  <i className="fa-regular fa-face-frown-open"></i>
                 </span>
               </label>
               <label
@@ -145,7 +151,7 @@ export default function UserStatusCard(props) {
                   }}
                 />
                 <span>
-                  <i class="fa-regular fa-face-meh"></i>
+                  <i className="fa-regular fa-face-meh"></i>
                 </span>
               </label>
               <label
@@ -163,7 +169,7 @@ export default function UserStatusCard(props) {
                   }}
                 />
                 <span>
-                  <i class="fa-regular fa-face-smile"></i>
+                  <i className="fa-regular fa-face-smile"></i>
                 </span>
               </label>
               <label
@@ -181,14 +187,14 @@ export default function UserStatusCard(props) {
                   }}
                 />
                 <span>
-                  <i class="fa-regular fa-face-laugh-beam"></i>
+                  <i className="fa-regular fa-face-laugh-beam"></i>
                 </span>
               </label>
-              <span class="user-selection"></span>
+              <span className="user-selection"></span>
             </div>
             <div className="feelings-container">
               <div className="feelings-line-container">
-                <label for="pet-select">You are feeling:</label>
+                <label htmlFor="pet-select">You are feeling:</label>
                 {edit ? <div className="status-dropdwn-container"><select onChange={handleFeelingsChange} className="status-select" id="feeings-status-select" name="feelings">
                   <option selected={ feelings === "" ? true : false} value="">How are you feeling?</option>
                   <option selected={ feelings === "Happy" ? true : false} value="Happy">Happy</option>

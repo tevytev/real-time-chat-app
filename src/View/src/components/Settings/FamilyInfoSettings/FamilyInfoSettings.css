@@ -58,7 +58,7 @@
 .inner-test {
   height: 150px;
   width: 100%;
-  border: solid var(--dark);
+  border: solid var(--dark) 2px;
   border-radius: 5px;
   overflow: scroll;
 }
@@ -87,7 +87,7 @@
     color: var(--black);
     height: 50px;
     width: 100%;
-    border-bottom: solid var(--dark);
+    border-bottom: solid var(--dark) 2px;
     padding: 1rem 1rem;
 
 }
@@ -122,3 +122,7 @@
   gap: 1rem;
 }
 
+.no-family-members {
+  color: var(--black);
+  padding: 1rem 0;
+}

@@ -13,19 +13,19 @@ export default function HeaderFamilyIcon(props) {
     if (active) {
         return (
         <>
-        <div className="family-icon-container-active">
+        <li className="family-icon-container-active">
             {icon}
-        </div>
+        </li>
         </>
     ) 
     } else {
         return (
             <>
-            <div onClick={(e) => {
+            <li onClick={(e) => {
                 setActiveTab(tabType)
             }} className="family-icon-container">
                 {icon}
-            </div>
+            </li>
             </>
         ) 
     }

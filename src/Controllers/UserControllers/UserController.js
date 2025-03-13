@@ -4,7 +4,6 @@ const { Status } = require("../../Models/Status/Status");
 const getUser = async (req, res) => {
   const { userId } = req.params;
   const user = await User.findOne({ _id: userId });
-  console.log(user);
   res.status(201).json(user);
 };
 
@@ -13,7 +12,6 @@ const getUserStatus = async (req, res) => {
 
   try {
     const status = await Status.findOne({ user: userId });
-    console.log(status);
     res.status(200).json(status);
   } catch (error) {
     console.log(error);

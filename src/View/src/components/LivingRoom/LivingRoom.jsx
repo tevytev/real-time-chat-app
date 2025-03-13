@@ -18,7 +18,7 @@ const ROOM_URL = "/api/room/";
 const socket = io("http://localhost:5432/", { transports: ["websocket"] });
 
 export default function LivingRoom() {
-  const { user, family } = useContext(UserContext);
+  const { user, family, activeTab } = useContext(UserContext);
 
   const [activeRoomUsers, setActiveRoomUsers] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -28,6 +28,12 @@ export default function LivingRoom() {
   const [noMoreMessages, setNoMoreMessages] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
+
+  // Message to send states
+  const [imageToSend, setImageToSend] = useState(null);
+  const [messageToSend, setMessageToSend] = useState("");
+
+  const [inputImage, setInputImage] = useState(null);
 
   // Reference to chat window
   const chatWindowRef = useRef(null);
@@ -39,6 +45,12 @@ export default function LivingRoom() {
       setScrollPosition(scrollTop); // Update scroll position state
     }
   };
+
+  useEffect(() => {
+    if (chatWindowRef.current) {
+      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+    }
+  }, [activeRoomUsers]); // Trigger when messages change
 
   // Effect to add scroll event listener to chat window
   useEffect(() => {
@@ -77,7 +89,13 @@ export default function LivingRoom() {
           setActiveRoomUsers(activeUsers);
         }
       } catch (error) {
-        console.log(error);
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          localStorage.removeItem("user");
+          localStorage.removeItem("family");
+          navigate("/register");
+        }
       }
     };
 
@@ -98,18 +116,55 @@ export default function LivingRoom() {
           setLoadingMessages(false);
         }
       } catch (error) {
-        console.log(error);
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          localStorage.removeItem("user");
+          localStorage.removeItem("family");
+          navigate("/register");
+        }
       }
     };
-
-    // if (activeRoomId !== null) {
-    //   socket.emit("joinRoom", activeRoomId);
-    // }
 
     socket.emit("joinRoom", family.livingRoomId);
 
     fetchRoomUsers(), fetchMessages();
-  }, []);
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (scrollPosition === 0 && messages.length >= 20) {
+      const fetchMoreMessages = async () => {
+        try {
+          setLoadingMoreMessages(true);
+          const response = await axios.get(
+            `${MESSAGE_URL}livingRoom/${family.livingRoomId}?skip=${skip}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              withCredentials: true,
+            }
+          );
+          if (response.status === 200) {
+            const messageData = response.data;
+            if (messageData.length < 20) setNoMoreMessages(true);
+            setMessages((prevMessages) => [
+              ...messageData.reverse(),
+              ...prevMessages,
+            ]);
+            setLoadingMoreMessages(false);
+            setSkip((prev) => prev + 20);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      if (messages.length && !noMoreMessages) fetchMoreMessages();
+    }
+
+    return () => {};
+  }, [scrollPosition]);
 
   // Websocket effect to update messages state in real-time
   useEffect(() => {
@@ -129,13 +184,49 @@ export default function LivingRoom() {
     };
   }, [socket]);
 
+  // Scroll to bottom of chat window when message is sent/received or the user switches chats
+  useEffect(() => {
+    if (chatWindowRef.current) {
+      chatWindowRef.current.scrollTo({
+        top: chatWindowRef.current.scrollHeight,
+        behavior: "smooth", // Smooth scrolling
+      });
+    }
+  }, [newMessages]);
+
+  const handleFileChange = (e) => {
+    const input = document.getElementById("file-upload");
+    const file = input.files[0];
+    const objectURL = URL.createObjectURL(file);
+
+    if (file) {
+      const fileType = ["image/jpeg", "image/png", "image/jpg"];
+
+      if (fileType.includes(file.type)) {
+        // setError("");
+        setInputImage(objectURL);
+        setImageToSend(file);
+      } else {
+        // setError("Error: Please upload a valid image file (JPG, JPEG, PNG)");
+        setInputImage(null);
+        setImageToSend(null);
+      }
+    }
+  };
+
+  const cancelSendImage = (e) => {
+    const input = document.getElementById("file-upload");
+    input.files = null;
+    setInputImage(null);
+    setImageToSend(null);
+  };
+
   // Handle send message
   const handleSendMessage = async (e) => {
-    const input = document.getElementById("livingroom-message-input");
-    const message = input.value;
+    e.preventDefault();
 
     const body = {
-      messageContent: message,
+      messageContent: messageToSend,
     };
 
     try {
@@ -155,14 +246,50 @@ export default function LivingRoom() {
         // emit message to all active room users
         socket.emit("sendMessage", family.livingRoomId, createdMessage);
         // clear input
-        input.value = "";
+        setMessageToSend("");
       }
     } catch (error) {
       console.log(error);
     }
   };
+  
+  const handleSendImageMessage = async (e) => {
+    e.preventDefault();
+    if (!imageToSend) return;
 
-  if (activeRoomUsers.length) {
+    // Attach image to body
+    const formData = new FormData();
+    formData.append("image", imageToSend);
+
+    try {
+      
+      const response = await axios.post(
+        `${MESSAGE_URL}livingRoom/createImage/${family.livingRoomId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 201) {
+        console.log(response)
+        // created message to send to websocket
+        const createdMessage = response.data.message;
+        // emit message to all active room users
+        socket.emit("sendMessage", family.livingRoomId, createdMessage);
+        // clear input
+        setImageToSend(null);
+        setInputImage(null);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  if (!loadingMessages) {
     return (
       <>
         <section className="living-room-chat-window-container">
@@ -180,12 +307,12 @@ export default function LivingRoom() {
           >
             {loadingMoreMessages ? (
               <div className="loading-more-chat-window-scroll-container">
-                <div class="loader"></div>
+                <div className="loader"></div>
               </div>
             ) : null}
             {loadingMessages ? (
               <div className="loading-chat-window-scroll-container">
-                <div class="loader"></div>
+                <div className="loader"></div>
               </div>
             ) : (
               messages.map((messageObj, index) => {
@@ -204,26 +331,33 @@ export default function LivingRoom() {
                   const formattedTime = `${hours}:${minutes} ${ampm}`;
                   let username = "";
                   let pfp = "";
-                  for (let i = 0; i < activeRoomUsers.length; i++) {
-                    if (activeRoomUsers[i]._id === messageObj.user) {
+                  let image = messageObj.image ? messageObj.image : null;
+                  if (activeRoomUsers.length) {
+                    for (let i = 0; i < activeRoomUsers.length; i++) {
+                      if (activeRoomUsers[i]._id === messageObj.user) {
                         username = activeRoomUsers[i].firstName;
                         pfp = activeRoomUsers[i].profilePic;
+                      }
                     }
-                  }
 
-                  return (
-                    <>
-                    
-                      <ReceivedMessage
-                        livingRoom={true}
-                        username={username}
-                        key={index}
-                        time={formattedTime}
-                        text={messageObj.content}
-                        pfp={pfp}
-                      />
-                    </>
-                  );
+                    if (username === "") {
+                      try {
+                        const getUser = async () => {};
+                      } catch (error) {}
+                    }
+
+                    return (
+                        <ReceivedMessage
+                          livingRoom={true}
+                          username={username}
+                          key={index}
+                          time={formattedTime}
+                          text={messageObj.content}
+                          pfp={pfp}
+                          image={image}
+                        />
+                    );
+                  }
                 } else {
                   const date = new Date(messageObj.dateCreated);
 
@@ -238,14 +372,14 @@ export default function LivingRoom() {
 
                   // Format time without leading zero
                   const formattedTime = `${hours}:${minutes} ${ampm}`;
+                  let image = messageObj.image ? messageObj.image : null;
                   return (
-                    <>
                       <UserMessage
                         key={index}
                         time={formattedTime}
                         text={messageObj.content}
+                        image={image}
                       />
-                    </>
                   );
                 }
               })
@@ -265,15 +399,27 @@ export default function LivingRoom() {
                 // Format time without leading zero
                 const formattedTime = `${hours}:${minutes} ${ampm}`;
 
+                let username = "";
+                let pfp = "";
+                let image = messageObj.image ? messageObj.image : null;
+
+                for (let i = 0; i < activeRoomUsers.length; i++) {
+                  if (activeRoomUsers[i]._id === messageObj.user) {
+                    username = activeRoomUsers[i].firstName;
+                    pfp = activeRoomUsers[i].profilePic;
+                  }
+                }
+
                 return (
-                  <>
                     <ReceivedMessage
-                      username={activeRoomUsers[0].firstName}
+                      livingRoom={true}
+                      username={username}
+                      pfp={pfp}
                       key={index}
                       time={formattedTime}
                       text={messageObj.content}
+                      image={image}
                     />
-                  </>
                 );
               } else {
                 const date = new Date(messageObj.dateCreated);
@@ -289,28 +435,58 @@ export default function LivingRoom() {
 
                 // Format time without leading zero
                 const formattedTime = `${hours}:${minutes} ${ampm}`;
+                let image = messageObj.image ? messageObj.image : null;
                 return (
-                  <>
                     <UserMessage
                       key={index}
                       time={formattedTime}
                       text={messageObj.content}
+                      image={image}
                     />
-                  </>
                 );
               }
             })}
           </div>
-          <div className="chat-window-footer">
-            <textarea
-              id="livingroom-message-input"
-              placeholder="Type a message"
-              type="text"
+          <form className="chat-window-footer">
+          {imageToSend !== null ? (
+              <>
+                <div className="image-input" id="message-input">
+                  <div onClick={cancelSendImage} className="image-cancel-container"><i className="fa-solid fa-xmark"></i></div>
+                  <img
+                    className="image-to-send"
+                    src={inputImage ? inputImage : null}
+                    alt=""
+                  />
+                </div>
+              </>
+            ) : (
+              <textarea
+                value={messageToSend}
+                onChange={(e) => {
+                  setMessageToSend(e.target.value);
+                }}
+                id="livingroom-message-input"
+                placeholder="Type a message"
+                type="text"
+              />
+            )}
+            <label htmlFor="file-upload" className={messageToSend ? "message-send-btn disabled-message" : "message-send-btn" } >
+              <i className="fa-solid fa-image"></i>
+            </label>
+            <input
+              disabled={messageToSend ? true : false}
+              onChange={handleFileChange}
+              id="file-upload"
+              type="file"
             />
-            <button onClick={handleSendMessage} className="message-send-btn">
+            <button
+              type="submit"
+              onClick={messageToSend ? handleSendMessage : handleSendImageMessage}
+              className="message-send-btn"
+            >
               <i className="fa-solid fa-paper-plane"></i>
             </button>
-          </div>
+          </form>
         </section>
       </>
     );

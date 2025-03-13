@@ -20,6 +20,9 @@
   color: var(--black);
   width: 100%;
   min-height: 80px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .status-list-header-container h2 {
@@ -30,7 +33,7 @@
   grid-template-columns: 32.66% 32.66% 32.66%;
   display: grid;
   grid-auto-rows: min-content;
-  row-gap: .5rem;
+  row-gap: 1rem;
   align-items: flex-start;
   justify-items: center;
   justify-content: space-between;
@@ -76,7 +79,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  height: auto;
+  height: 625px;
   min-height: 600px;
   width: 100%;
   background-color: var(--white);
@@ -111,6 +114,9 @@
 }
 
 .status-pfp {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   aspect-ratio: 1 / 1;
   border-radius: 999999px;
   overflow: hidden;
@@ -307,4 +313,30 @@
   background-color: var(--white);
   border-radius: 10px;
   box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
+}
+
+
+@media screen and (max-width: 1024px) {
+  .status-list-outer-container  {
+    border-radius: 0 0 10px 10px;
+    width: 100%;
+  }
+}
+
+@media (min-width: 636px) and (max-width: 1330px) {
+
+  .status-list-container {
+    grid-template-columns: 49% 49%;
+  }
+
+}
+
+
+@media (min-width: 0px) and (max-width: 635px) {
+
+  .status-list-container {
+    grid-template-columns: 100%;
+    row-gap: 1rem;
+  }
+
 }

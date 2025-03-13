@@ -8,7 +8,7 @@
     height: 100%;
     width: 100%;
     background-color: #00000060;
-    z-index: 1;
+    z-index: 5;
 }
 
 .sure-container {
@@ -19,7 +19,8 @@
     gap: 1rem;
     text-align: center;
     padding: 2rem 2rem;
-    width: 400px;
+    width: calc(100vw - 2rem);
+    max-width: 400px;
     height: auto;
     background-color: var(--white);
     border-radius: 15px;
@@ -39,7 +40,7 @@
     padding: 1rem 0;
     width: 50%;
     border-radius: 9999px;
-    border: solid var(--primary);
+    border: solid var(--primary) 2px;
     background-color: var(--primary);
     cursor: pointer;
     transition: all 100ms ease-out;

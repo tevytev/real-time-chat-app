@@ -62,6 +62,19 @@ const getAllRooms = async (req, res) => {
       res.status(404).send({ message: "Failed to find rooms" });
     }
 
+    // Convert family to an object to append family group chat ID
+    // const roomsToSend = rooms.toObject();
+
+    for (let i = 0; i < rooms.length; i++) {
+      const roomObject = rooms[i].toObject();
+      for (let j = 0; j < roomObject.members.length; j++) {
+        if (roomObject.members[j].toHexString() === id) continue;
+        const user = await User.findById(roomObject.members[j]);
+        roomObject.firstName = user.firstName;
+      }
+      rooms[i] = roomObject;
+    }
+
     res.status(200).json(rooms);
     
   } catch (error) {

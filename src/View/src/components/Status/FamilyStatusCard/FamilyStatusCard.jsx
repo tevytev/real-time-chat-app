@@ -21,7 +21,7 @@ export default function FamilyStatusCard(props) {
             <div className="status-name-container">
               <p>{firstName}</p>
               {userId === family.creator ? <div className="status-creator-accent-container">
-                <i class="fa-solid fa-star"></i>
+                <i className="fa-solid fa-star"></i>
               </div> : <></>}
             </div>
           </div>
@@ -29,7 +29,7 @@ export default function FamilyStatusCard(props) {
             <div className="mood-bar-emotes-container">
               <p>Mood Meter</p>
             </div>
-            <div class="radio-input">
+            <div className="radio-input">
                 <label>
                   <input
                     value="value-1"
@@ -39,7 +39,7 @@ export default function FamilyStatusCard(props) {
                     checked={mood === 1 ? true : false}
                     disabled
                   />
-                  <span><i class="fa-regular fa-face-frown"></i></span>
+                  <span><i className="fa-regular fa-face-frown"></i></span>
                 </label>
                 <label>
                   <input
@@ -50,7 +50,7 @@ export default function FamilyStatusCard(props) {
                     checked={mood === 2 ? true : false}
                     disabled
                   />
-                  <span><i class="fa-regular fa-face-frown-open"></i></span>
+                  <span><i className="fa-regular fa-face-frown-open"></i></span>
                 </label>
                 <label>
                   <input
@@ -61,7 +61,7 @@ export default function FamilyStatusCard(props) {
                     checked={mood === 3 ? true : false}
                     disabled
                   />
-                  <span><i class="fa-regular fa-face-meh"></i></span>
+                  <span><i className="fa-regular fa-face-meh"></i></span>
                 </label>
                 <label>
                   <input
@@ -72,7 +72,7 @@ export default function FamilyStatusCard(props) {
                     checked={mood === 4 ? true : false}
                     disabled
                   />
-                  <span><i class="fa-regular fa-face-smile"></i></span>
+                  <span><i className="fa-regular fa-face-smile"></i></span>
                 </label>
                 <label>
                   <input
@@ -83,9 +83,9 @@ export default function FamilyStatusCard(props) {
                     checked={mood === 5 ? true : false}
                     disabled
                   />
-                  <span><i class="fa-regular fa-face-laugh-beam"></i></span>
+                  <span><i className="fa-regular fa-face-laugh-beam"></i></span>
                 </label>
-                <span class="selection"></span>
+                <span className="selection"></span>
               </div>
             <div className="feelings-container">
                 <div className="feelings-line-container">

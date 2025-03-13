@@ -5,7 +5,6 @@ import axios from "../../api/axios";
 const AUTH_URL = "/api/auth/";
 const FAMILY_URL = "/api/family/";
 import AuthForm from "../../components/AuthForm/AuthForm";
-import LivingRoom from "../../components/LivingRoom/LivingRoom";
 
 export default function Auth() {
 
@@ -16,10 +15,23 @@ export default function Auth() {
   const navigate = useNavigate();
 
   const [firstName, setFirstName] = useState("");
+  const [validFirstName, setValidFirstName] = useState(false);
+
   const [lastName, setLastName] = useState("");
+  const [validLastName, setValidLastName] = useState(false);
+
   const [email, setEmail] = useState("");
+  const [validEmail, setValidEmail] = useState(false);
+
   const [password, setPassword] = useState("");
+  const [validPassword, setValidPassword] = useState(false);
+
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [validConfirmPassword, setValidConfirmPassword] = useState(false);
+
   const [authType, setAuthType] = useState("login");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [formStarted, setFormStarted] = useState(false);
   let signInUserId = '';
 
 
@@ -62,7 +74,11 @@ export default function Auth() {
         } else navigate("/familysetup");
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        setErrorMsg("No server response");
+      } else if (error.response?.status === 400) {
+        setErrorMsg("Incorrect email or password");
+      }
     }
   };
 
@@ -84,7 +100,6 @@ export default function Auth() {
         },
         withCredentials: true,
       });
-      console.log(response);
 
       if (response.status === 201) {
         const userData = {
@@ -102,7 +117,11 @@ export default function Auth() {
         navigate("/familysetup");
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        setErrorMsg("No server response");
+      } else if (error.response?.status === 400) {
+        setErrorMsg("Email is already registered");
+      }
     }
   };
 
@@ -120,7 +139,6 @@ export default function Auth() {
       );
 
       if (response.status === 200) {
-        console.log(response);
         const familyData = {
           familyId: response.data._id,
           familyAccessCode: response.data.familyAccessCode,
@@ -146,6 +164,8 @@ export default function Auth() {
     setLastName("");
     setEmail("");
     setPassword("");
+    setConfirmPassword("");
+    setErrorMsg("");
   };
     return (
       <>
@@ -160,9 +180,25 @@ export default function Auth() {
           setEmail={setEmail}
           password={password}
           setPassword={setPassword}
+          confirmPassword={confirmPassword}
+          setConfirmPassword={setConfirmPassword}
           handleLogin={handleLogin}
           handleSignup={handleSignup}
           clearInputs={clearInputs}
+          validFirstName={validFirstName}
+          setValidFirstName={setValidFirstName}
+          validLastName={validLastName}
+          setValidLastName={setValidLastName}
+          validEmail={validEmail}
+          setValidEmail={setValidEmail}
+          validPassword={validPassword}
+          setValidPassword={setValidPassword}
+          validConfirmPassword={validConfirmPassword}
+          setValidConfirmPassword={setValidConfirmPassword}
+          formStarted={formStarted}
+          setFormStarted={setFormStarted}
+          errorMsg={errorMsg}
+          setErrorMsg={setErrorMsg}
         />
       </>
     );

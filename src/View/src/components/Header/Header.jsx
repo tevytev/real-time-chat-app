@@ -8,14 +8,12 @@ const LOGOUT_URL = "/api/auth/logout";
 import axios from "../../api/axios";
 
 export default function Header(props) {
+
+  const { handleToggleChats } = props;
+
   const navigate = useNavigate();
 
-  const {
-    user,
-    family,
-    activeTab,
-    creator
-  } = useContext(UserContext);
+  const { user, family, activeTab, creator } = useContext(UserContext);
 
   const [pfp, setPfp] = useState();
 
@@ -29,8 +27,9 @@ export default function Header(props) {
 
   const handleLogoutClick = (e) => {
     const creatorWindow = document.getElementById(`logout-window`);
-    
-    if (creatorWindow.style.display === "") creatorWindow.style.display = "flex";
+
+    if (creatorWindow.style.display === "")
+      creatorWindow.style.display = "flex";
     else creatorWindow.style.display = "";
   };
 
@@ -53,37 +52,56 @@ export default function Header(props) {
     }
   };
 
-
   return (
     <>
-      <header className="header-container">
-        <div className="header-family-status-container">
-          <HeaderFamilyIcon
-            tabType={"inbox"}
-            active={activeTab === "inbox" ? true : false}
-            icon={<i class="fa-solid fa-comment-dots"></i>}
-          />
-          <HeaderFamilyIcon
-            tabType={"familyChat"}
-            icon={<i class="fa-solid fa-people-roof"></i>}
-            active={activeTab === "familyChat" ? true : false}
-          />
-          <HeaderFamilyIcon
-            tabType={"status"}
-            icon={<i class="fa-solid fa-face-smile"></i>}
-            active={activeTab === "status" ? true : false}
-          />
-          <HeaderFamilyIcon
-            tabType={"settings"}
-            icon={<i className="fa-solid fa-gear"></i>}
-            active={activeTab === "settings" ? true : false}
-          />
-          <h1>{activeTab === "inbox" ? "Rooms" : activeTab === "familyChat" ? "Living Room" : activeTab === "status" ? "Family Status" : activeTab === "settings" ? "Settings" : null}</h1>
-        </div>
-        <div className="header-user-status-container">
-          <div
-            className={pfp ? "header-user-pfp" : "default-header-user-pfp"}
-          >
+      <header id="dash-header" className="header-container">
+        <nav id="nav" className="header-family-status-container">
+          <ul className="header-family-status-list-container">
+            <HeaderFamilyIcon
+              tabType={"inbox"}
+              active={activeTab === "inbox" ? true : false}
+              icon={<i className="fa-solid fa-door-open"></i>}
+            />
+            <HeaderFamilyIcon
+              tabType={"familyChat"}
+              icon={<i className="fa-solid fa-couch"></i>}
+              active={activeTab === "familyChat" ? true : false}
+            />
+            <HeaderFamilyIcon
+              tabType={"status"}
+              icon={<i className="fa-solid fa-face-smile"></i>}
+              active={activeTab === "status" ? true : false}
+            />
+            <HeaderFamilyIcon
+              tabType={"settings"}
+              icon={<i className="fa-solid fa-gear"></i>}
+              active={activeTab === "settings" ? true : false}
+            />
+          </ul>
+          <h1>
+            {activeTab === "inbox"
+              ? "Rooms"
+              : activeTab === "familyChat"
+              ? "Living Room"
+              : activeTab === "status"
+              ? "Family Status"
+              : activeTab === "settings"
+              ? "Settings"
+              : null}
+          </h1>
+        </nav>
+        <div id="header-user" className="header-user-status-container">
+          <div className="contact-burger-btn-container">
+            <div onClick={handleToggleChats} className="contact-burger-btn">
+              <label className="buttons__burger" htmlFor="burger">
+                <input disabled type="checkbox" id="burger" />
+                <span></span>
+                <span></span>
+                <span></span>
+              </label>
+            </div>
+          </div>
+          <div className={pfp ? "header-user-pfp" : "default-header-user-pfp"}>
             {pfp ? (
               <img src={pfp} alt="user-profile-pic" />
             ) : user.firstName ? (
@@ -93,17 +111,26 @@ export default function Header(props) {
           <div className="header-user-info">
             <div className="header-family-name-container">
               <h1>{`${user.firstName} ${user.lastName}`}</h1>
-              {creator ? <div className="creator-accent-container">
-                <i class="fa-solid fa-star"></i>
-              </div> : <></>}
+              {creator ? (
+                <div className="creator-accent-container">
+                  <i className="fa-solid fa-star"></i>
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
             <p>{family.familyName} family</p>
-            <button onClick={handleLogoutClick} className="header-logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+            <button onClick={handleLogoutClick} className="header-logout-btn">
+              <i className="fa-solid fa-arrow-right-from-bracket"></i>
+            </button>
           </div>
+          <HeaderOptions />
         </div>
         <div id={`logout-window`} className="sure-message-backdrop">
           <div className="sure-container">
-            <p>Are you sure you want to <strong>Logout</strong></p>
+            <p>
+              Are you sure you want to <strong>Logout</strong>
+            </p>
             <div className="sure-btn-container">
               <button onClick={handleLogout}>Yes, logout</button>
               <button onClick={handleLogoutClick}>Cancel</button>

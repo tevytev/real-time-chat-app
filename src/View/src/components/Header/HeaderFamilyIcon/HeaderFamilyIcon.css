@@ -37,3 +37,13 @@
     font-size: 2rem;
     color: var(--white);
 }
+
+@media screen and (max-width: 700px) {
+    .family-icon-container i {
+        font-size: 1.5rem;
+    }
+
+    .family-icon-container-active i {
+        font-size: 1.5rem;
+    }
+  }

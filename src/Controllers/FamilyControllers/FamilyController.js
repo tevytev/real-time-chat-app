@@ -126,7 +126,11 @@ const joinFamily = async (req, res) => {
     // If user submitted access code matches family access code push user id to family members
 
     if (family) {
-      if (family.members.includes(id)) return res.status(400).json({ message: "you are already in the family" });
+      if (family.members.includes(id))
+        return res
+          .status(400)
+          .json({ message: "you are already in the family" });
+
       family.members.push(id);
       await family.save();
 
@@ -144,17 +148,23 @@ const joinFamily = async (req, res) => {
         // skip users id
         if (numberFromObjectId === id) continue;
 
-        // Create room
-        const room = new Room({
-          groupChat: false,
+        // Check if user has an old room from previously being in the family
+        const oldRoom = await Room.find({
+          members: { $all: [family.members[i].toHexString(), id] },
         });
+
+        // If so, continue
+        if (oldRoom.length) continue;
+
+        // Create room
+        const room = new Room({});
 
         // Push member ids into new rooms "members" schema
         room.members.push(family.members[i]);
         room.members.push(id);
 
         // Save room to database
-        room.save();
+        await room.save();
       }
 
       // Find family group chat
@@ -162,9 +172,12 @@ const joinFamily = async (req, res) => {
         family: family._id,
       });
 
-      // Push user to "members" schema and save to database
-      familyGroupChat.members.push(id);
-      familyGroupChat.save();
+      // Check if user has been in the family group chat
+      if (!familyGroupChat.members.includes(id)) {
+        // Push user to "members" schema and save to database
+        familyGroupChat.members.push(id);
+        await familyGroupChat.save();
+      }
 
       // Convert family to an object to append family group chat ID
       const familyToSend = family.toObject();
@@ -190,26 +203,7 @@ const leaveFamily = async (req, res) => {
       { _id: familyId },
       { $pull: { members: id } }, // Pull the memberId out of the members array
       { new: true } // `new: true` returns the updated document
-    )
-      .then(() => {
-        console.log("member reference removed");
-      })
-      .catch((error) => {
-        console.error("error removing comment", error);
-      });
-
-    // Find and update family group chat members array
-    const familyGroupChat = await LivingRoom.findOneAndUpdate(
-      { family: familyId },
-      { $pull: { members: id } }, // Pull the memberId out of the members array
-      { new: true } // `new: true` returns the updated document
-    )
-      .then(() => {
-        console.log("member reference removed");
-      })
-      .catch((error) => {
-        console.error("error removing comment", error);
-      });
+    );
 
     // Find and update user's family field
     const updatedUser = await User.findByIdAndUpdate(
@@ -217,28 +211,60 @@ const leaveFamily = async (req, res) => {
       { family: null }, // update family ID to null
       { new: true } // Return the updated user
     );
-    
+
     // If user is the family creator, pass down creator priviledges to next user in line
     const newFamily = await Family.findById(familyId);
-    if (id === newFamily.creator.toHexString() && newFamily.members.length > 0) {
+    if (
+      id === newFamily.creator.toHexString() &&
+      newFamily.members.length > 0
+    ) {
       newFamily.creator = newFamily.members[0];
       await newFamily.save();
-    };
+    }
 
     // If there are no more members in the family, delete family and living room from database
     if (newFamily.members.length === 0) {
       await Family.deleteOne({ _id: familyId });
       await LivingRoom.deleteOne({ family: familyId });
-    } 
-
-    // Delete all of the user's messages and rooms
-    await Message.deleteMany({ user: id });
-    await Room.deleteMany({ members: id });
+    }
 
     res.status(200).json({ message: "success" });
   } catch (error) {
     console.error("Error while trying to leave family :", error);
     res.status(500).json({ message: "Failed to leave family" });
+  }
+};
+
+const removeFamilyMember = async (req, res) => {
+  const { memberId, familyId } = req.body;
+
+  try {
+    // Find and update family members array
+    const family = await Family.findByIdAndUpdate(
+      { _id: familyId },
+      { $pull: { members: memberId } }, // Pull the memberId out of the members array
+      { new: true } // `new: true` returns the updated document
+    );
+
+    // Find and update user's family field
+    const updatedUser = await User.findByIdAndUpdate(
+      { _id: memberId }, // Find user with matching memberId
+      { family: null }, // update family ID to null
+      { new: true } // Return the updated user
+    );
+
+    // Find family group chat
+    const familyGroupChat = await LivingRoom.findOne({
+      family: family._id,
+    });
+
+    // Convert family to an object to append family group chat ID
+    const familyToSend = family.toObject();
+    familyToSend.livingRoomId = familyGroupChat._id;
+
+    res.status(200).json(familyToSend);
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -256,15 +282,22 @@ const getfamilyStatus = async (req, res) => {
       // If userId matching current user skip iteration
       if (id === members[i].toHexString()) continue;
 
+      console.log(members[i]);
+
       // Query family member status
       const status = await Status.findOne({ user: members[i] });
+
+      console.log(status);
 
       // Query room for current user and current family member
       const room = await Room.find({
         members: { $all: [id, members[i].toHexString()] },
       });
 
-      console.log(room[0]._id);
+      console.log(`this is the room :`);
+      console.log(room);
+
+      // console.log(room[0]._id);
 
       // Convert status to an object to append more essential information
       const statusToPush = status.toObject();
@@ -286,7 +319,59 @@ const getfamilyStatus = async (req, res) => {
   }
 };
 
-const editFamilyName = async () => {};
+const editFamily = async (req, res) => {
+  const { familyId } = req.params;
+  const { accessCode, familyName } = req.body;
+
+  try {
+    // Find family using family ID
+    const family = await Family.findById(familyId).exec();
+
+    if (accessCode) family.familyAccessCode = accessCode;
+    if (familyName) family.familyName = familyName;
+    await family.save();
+
+    // Find family group chat
+    const familyGroupChat = await LivingRoom.findOne({
+      family: family._id,
+    });
+
+    // Convert family to an object to append family group chat ID
+    const familyToSend = family.toObject();
+    familyToSend.livingRoomId = familyGroupChat._id;
+
+    res.status(200).json(familyToSend);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const changeCreator = async (req, res) => {
+  const { familyId } = req.params;
+  const { memberId } = req.body;
+
+  try {
+    // Find family using family ID
+    const family = await Family.findById(familyId);
+
+    // Set family creator to member ID and save document
+    family.creator = memberId;
+    await family.save();
+
+    // Find family group chat
+    const familyGroupChat = await LivingRoom.findOne({
+      family: family._id,
+    });
+
+    // Convert family to an object to append family group chat ID
+    const familyToSend = family.toObject();
+    familyToSend.livingRoomId = familyGroupChat._id;
+
+    res.status(200).json(familyToSend);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 module.exports = {
   createFamily,
@@ -295,4 +380,7 @@ module.exports = {
   leaveFamily,
   getfamilyStatus,
   getFamilyMembers,
+  removeFamilyMember,
+  editFamily,
+  changeCreator
 };

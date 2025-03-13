@@ -6,7 +6,6 @@
     width: 70%;
     height: 100%;
     background-color: var(--offwhite);
-    border-radius: 0 0 0 10px;
     position: relative;
     box-shadow: inset 0px 10px 26px -3px rgba(0,0,0,0.1);
 }
@@ -65,7 +64,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
+    gap: .5rem;
     height: 100%;
     width: auto;
     color: #1C1D21;
@@ -74,7 +73,7 @@
 .chat-window-footer {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
     gap: 10px;
     height: auto;
     width: 100%;
@@ -95,6 +94,57 @@
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
+.image-input {
+    background-color: var(--white);
+    border: none;
+    border-radius: 10px;
+    height: auto;
+    min-height: calc( 70px - 1rem);
+    max-height: 300px;
+    width: 80%;
+    overflow-y: scroll;
+    color: var(--black);
+    padding: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    resize: none;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    position: relative;
+}
+
+.image-input::-webkit-scrollbar {
+    display: none;
+}
+
+.image-to-send {
+    height: 100%;
+    border-radius: 10px;
+    max-width: 50%;
+}
+
+.image-cancel-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 1rem;
+    right: 1rem;
+    position: absolute;
+    height: 30px;
+    width: 30px;
+    background-color: var(--primary);
+    border-radius: 999999px;
+    color: var(--white);
+    transition: all 100ms ease-out;
+}
+
+.image-cancel-container i {
+    font-size: 1rem;
+}
+
+.image-cancel-container:hover {
+    background-color: var(--dark);
+    cursor: pointer;
+}
+
 .chat-window-footer textarea:focus {
     outline: none;
 }
@@ -104,6 +154,9 @@
 } */
 
 .message-send-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100%;
     aspect-ratio: 1 / 1;
     border-radius: 100px;
@@ -111,6 +164,12 @@
     background-color: var(--primary);
     cursor: pointer;
     transition: all 100ms ease-out;
+    max-height: 54px;
+    
+}
+
+.disabled-message {
+    color: var(--light);
 }
 
 .message-send-btn:hover {
@@ -167,5 +226,11 @@
   @keyframes rot1 {
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  @media screen and (max-width: 1024px) {
+    .chat-window-container {
+        width: 100%;
     }
   }

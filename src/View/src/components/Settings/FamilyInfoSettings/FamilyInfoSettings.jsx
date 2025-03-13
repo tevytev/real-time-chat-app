@@ -6,10 +6,10 @@ import "./FamilyInfoSettings.css";
 const LOGOUT_URL = "/api/auth/logout";
 const FAMILY_URL = "/api/family/";
 import axios from "../../../api/axios";
+import { v4 as uuid } from "uuid";
 
 export default function FamilyInfoSettings(props) {
-
-  const { family, creator } = useContext(UserContext);
+  const { family, setFamily, creator } = useContext(UserContext);
 
   // References to user info and password inputs
   const familyNameRef = useRef();
@@ -17,6 +17,8 @@ export default function FamilyInfoSettings(props) {
   // Family info states
   const [edit, setEdit] = useState(false);
   const [members, setMembers] = useState([]);
+  const [familyName, setFamilyName] = useState("");
+  const [accessCode, setAccessCode] = useState("");
 
   //  Navigation function
   const navigate = useNavigate();
@@ -40,7 +42,13 @@ export default function FamilyInfoSettings(props) {
           setMembers(membersData);
         }
       } catch (error) {
-        console.log(error);
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          localStorage.removeItem("user");
+          localStorage.removeItem("family");
+          navigate("/register");
+        }
       }
     };
 
@@ -48,10 +56,18 @@ export default function FamilyInfoSettings(props) {
   }, []);
 
   useEffect(() => {
-
     if (edit) familyNameRef.current.focus();
-    
+    if (!edit) {
+      if (accessCode !== family.familyAccessCode) {
+        setAccessCode(family.familyAccessCode);
+      }
+    }
   }, [edit]);
+
+  useEffect(() => {
+    setFamilyName(family.familyName);
+    setAccessCode(family.familyAccessCode);
+  }, []);
 
   const handleCopyAccessCode = (e) => {
     e.preventDefault();
@@ -116,14 +132,13 @@ export default function FamilyInfoSettings(props) {
   };
 
   const handleLeaveFamily = async () => {
-
     const body = {
-      familyId: family.familyId
+      familyId: family.familyId,
     };
 
     try {
       const response = await axios.post(
-        `${FAMILY_URL}leave`, 
+        `${FAMILY_URL}leave`,
         JSON.stringify(body),
         {
           headers: {
@@ -140,7 +155,57 @@ export default function FamilyInfoSettings(props) {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
+
+  const uuidFromUuidV4 = () => {
+    const newUuid = uuid();
+    setAccessCode(newUuid);
+  };
+
+  const handleUpdateFamilyInfo = async (e) => {
+
+    e.preventDefault();
+
+    const body = {
+      familyName: familyName !== family.familyName ? familyName : null,
+      accessCode: accessCode !== family.familyAccessCode ? accessCode : null,
+    };
+
+    try {
+      const response = await axios.post(
+        `${FAMILY_URL + family.familyId}/edit`,
+        JSON.stringify(body),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 200) {
+
+        console.log(response);
+
+        // family data to received from server
+        const familyData = {
+          familyId: response.data._id,
+          familyAccessCode: response.data.familyAccessCode,
+          familyName: response.data.familyName,
+          livingRoomId: response.data.livingRoomId,
+          members: response.data.members,
+          creator: response.data.creator,
+        };
+
+        // Set server data to family state and local storage for data persistence
+        setFamily(familyData);
+        localStorage.setItem("family", JSON.stringify(familyData));
+        setEdit(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -150,7 +215,15 @@ export default function FamilyInfoSettings(props) {
           <form action="">
             <div className="setting-input-container">
               <label htmlFor="">Family name</label>
-              <input ref={familyNameRef} type="text" placeholder={family.familyName} />
+              <input
+                value={familyName}
+                onChange={(e) => {
+                  setFamilyName(e.target.value);
+                }}
+                ref={familyNameRef}
+                type="text"
+                placeholder={family.familyName}
+              />
             </div>
             <div className="setting-input-container">
               <label htmlFor="">Access code</label>
@@ -165,14 +238,18 @@ export default function FamilyInfoSettings(props) {
                 }}
                 className="setting-field"
               >
-                <p id="access-code">{family.familyAccessCode}</p>
-                <div id="clipboard" className="clipboard-container">
-                  <i class="fa-solid fa-arrows-rotate"></i>
+                <p id="access-code">{accessCode}</p>
+                <div
+                  onClick={uuidFromUuidV4}
+                  id="clipboard"
+                  className="clipboard-container"
+                >
+                  <i className="fa-solid fa-arrows-rotate"></i>
                 </div>
-              </div>{" "}
+              </div>
             </div>
             <div className="family-btn-container">
-              <button className="setting-btn">Save Changes</button>
+              <button onClick={handleUpdateFamilyInfo} className="setting-btn">Save Changes</button>
               <button
                 onClick={(e) => {
                   setEdit(false);
@@ -214,20 +291,24 @@ export default function FamilyInfoSettings(props) {
                   id="clipboard"
                   className="clipboard-container"
                 >
-                  <i class="fa-regular fa-clipboard"></i>
+                  <i className="fa-regular fa-clone"></i>
                 </div>
               </div>
             </div>
-            {creator ? <div className="family-btn-container">
-              <button
-                onClick={(e) => {
-                  setEdit(true);
-                }}
-                className="setting-btn"
-              >
-                Edit
-              </button>
-            </div> :<></> }
+            {creator ? (
+              <div className="family-btn-container">
+                <button
+                  onClick={(e) => {
+                    setEdit(true);
+                  }}
+                  className="setting-btn"
+                >
+                  Edit
+                </button>
+              </div>
+            ) : (
+              <></>
+            )}
             <div className="setting-input-container">
               <label htmlFor="">Members</label>
               <div className="members-down-container">
@@ -242,13 +323,19 @@ export default function FamilyInfoSettings(props) {
                 <div id="test" className="test-body">
                   <div className="inner-test">
                     <ul>
-                      {members.map((memberObj) => {
-                        return (
-                          <>
-                         <FamilyMemberListItem name={memberObj.firstName} memberId={memberObj.memberId} />
-                          </>
-                        )
-                      })}
+                      {members.length ? (
+                        members.map((memberObj) => {
+                          return (
+                              <FamilyMemberListItem
+                                name={memberObj.firstName}
+                                memberId={memberObj.memberId}
+                                key={`${memberObj.memberId}-list-member`}
+                              />
+                          );
+                        })
+                      ) : (
+                        <p className="no-family-members">No family members</p>
+                      )}
                     </ul>
                   </div>
                 </div>
@@ -258,7 +345,10 @@ export default function FamilyInfoSettings(props) {
               <button onClick={handleLogout} className="setting-btn">
                 Logout
               </button>
-              <button onClick={handleLeaveFamilyWindow} className="leave-family-btn">
+              <button
+                onClick={handleLeaveFamilyWindow}
+                className="leave-family-btn"
+              >
                 Leave Family
               </button>
             </div>
@@ -267,7 +357,7 @@ export default function FamilyInfoSettings(props) {
             <div className="sure-container">
               <p>
                 Are you sure you want to <strong>leave</strong> the{" "}
-              {family.familyName} family?
+                {family.familyName} family?
               </p>
               <div className="sure-btn-container">
                 <button onClick={handleLeaveFamily}>Yes</button>

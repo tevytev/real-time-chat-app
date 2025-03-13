@@ -6,7 +6,10 @@ const {
   joinFamily,
   leaveFamily,
   getfamilyStatus,
-  getFamilyMembers
+  getFamilyMembers,
+  removeFamilyMember,
+  editFamily,
+  changeCreator
 } = require("../Controllers/FamilyControllers/FamilyController");
 
 const router = express.Router();
@@ -20,10 +23,11 @@ router.post("/", createFamily);
 // Fetch family route
 router.get("/:familyId", getFamily);
 
+// Fetch family members
 router.get("/:familyId/members", getFamilyMembers);
 
 // Edit family route
-router.post("/:familyId/edit", )
+router.post("/:familyId/edit", editFamily);
 
 // Join family route
 router.post("/join", joinFamily);
@@ -31,7 +35,13 @@ router.post("/join", joinFamily);
 // Leave family route
 router.post("/leave", leaveFamily);
 
+// Remove family member from family
+router.post("/remove", removeFamilyMember);
+
 // Fetch family status
 router.get("/:familyId/status", getfamilyStatus);
+
+// Change family creator
+router.post("/:familyId/creator", changeCreator);
 
 module.exports = router;

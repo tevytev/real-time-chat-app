@@ -9,8 +9,8 @@ export default function HeaderOptions() {
     <>
       <div onClick={(e) => {
         setActive(!active);
-      }} id="user-options">
-        <i className="fa-solid fa-ellipsis"></i>
+      }} id={active ? "user-options-active" : "user-options"}>
+        <i class="fa-solid fa-ellipsis-vertical"></i>
         {active ? <HeaderOptionsDropdown /> : <></>}
       </div>
     </>

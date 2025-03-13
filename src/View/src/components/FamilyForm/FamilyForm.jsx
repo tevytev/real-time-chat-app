@@ -4,8 +4,18 @@ import "./FamilyForm.css";
 
 export default function FamilyForm(props) {
   const { user, setUser, family, setFamily } = useContext(UserContext);
-  
-  const { startOrJoin, setStartOrJoin, familyName, setFamilyName, familyAccessCode, setFamilyAccessCode, fetchFamily } = props;
+
+  const {
+    startOrJoin,
+    setStartOrJoin,
+    familyName,
+    setFamilyName,
+    familyAccessCode,
+    setFamilyAccessCode,
+    fetchFamily,
+    validFamilyName,
+    setValidFamilyName,
+  } = props;
 
   if (startOrJoin === null) {
     return (
@@ -75,7 +85,9 @@ export default function FamilyForm(props) {
             ></path>{" "}
           </svg>
           <h1 className="familysetup-header">Welcome, {user.firstName}!</h1>
-          <h2 className="familysetup-subheader">Let's get your family set up</h2>
+          <h2 className="familysetup-subheader">
+            Let's get your family set up
+          </h2>
           <form action="">
             <button
               onClick={(e) => {
@@ -176,7 +188,9 @@ export default function FamilyForm(props) {
             ></path>{" "}
           </svg>
           <h1 className="familysetup-header">Welcome, {user.firstName}!</h1>
-          <h2 className="familysetup-subheader">Please enter family credentials</h2>
+          <h2 className="familysetup-subheader">
+            Please enter family credentials
+          </h2>
           <form action="">
             <input
               className="auth-input"
@@ -189,18 +203,9 @@ export default function FamilyForm(props) {
               }}
               id=""
             />
-            <input
-              className="auth-input"
-              placeholder="Create family access code"
-              type="text"
-              name=""
-              value={familyAccessCode}
-              onChange={(e) => {
-                setFamilyAccessCode(e.target.value)
-              }}
-              id=""
-            />
-            <button onClick={fetchFamily} className="auth-btn">Start</button>
+            <button onClick={fetchFamily} className="auth-btn">
+              Start
+            </button>
           </form>
         </div>
       </>
@@ -282,9 +287,11 @@ export default function FamilyForm(props) {
             ></path>{" "}
           </svg>
           <h1 className="familysetup-header">Welcome, {user.firstName}!</h1>
-          <h2 className="familysetup-subheader">Please enter family credentials</h2>
+          <h2 className="familysetup-subheader">
+            Please enter family credentials
+          </h2>
           <form action="">
-          <input
+            <input
               className="auth-input"
               placeholder="Enter family name"
               type="text"
@@ -302,11 +309,13 @@ export default function FamilyForm(props) {
               name=""
               value={familyAccessCode}
               onChange={(e) => {
-                setFamilyAccessCode(e.target.value)
+                setFamilyAccessCode(e.target.value);
               }}
               id=""
             />
-            <button onClick={fetchFamily} className="auth-btn">Join</button>
+            <button onClick={fetchFamily} className="auth-btn">
+              Join
+            </button>
           </form>
         </div>
       </>

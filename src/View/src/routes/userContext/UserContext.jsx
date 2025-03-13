@@ -69,7 +69,13 @@ export const UserProvider = ({ children }) => {
         if (familyData.creator === user.userId) setCreator(true);
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("family");
+        navigate("/register");
+      }
     }
   };
 

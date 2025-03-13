@@ -2,13 +2,14 @@
     position: absolute;
     background-color: var(--gray);
     color: var(--black);
-    top: 40px;
-    right: 0;
+    top: calc(85px + 1rem);
+    right: 1rem;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
     border-radius: 10px;
     animation-name: example;
     animation-duration: 200ms;
     animation-timing-function: ease;
+    z-index: 10;
 }
 
 .header-options-container ul {
@@ -20,6 +21,7 @@
     gap: 1px;
     width: 100%;
     border-radius: 10px;
+    z-index: 10;
 }
 
 .header-options-container ul li {
@@ -34,12 +36,21 @@
     background-color: var(--offwhite);
 }
 
-.top-option {
-    border-radius: 10px 10px 0 0;
+.option {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    font-weight: bold;
 }
 
-.bottom-option {
-    border-radius: 0 0 10px 10px;
+.option i {
+    background-color: var(--primary);
+    padding: .5rem;
+    border-radius: 5px;
+    color: var(--white);
 }
 
 @keyframes example {
