@@ -14,9 +14,9 @@ function App() {
     <UserProvider>
       <Routes>
         <Route path="/" element={<Root />}>
-          <Route path="register" element={<Auth />} />
-          <Route path="familysetup" element={<FamilySetup />} />
-          <Route path="home" element={<Dashboard />} />
+          <Route path="/register" element={<Auth />} />
+          <Route path="/familysetup" element={<FamilySetup />} />
+          <Route path="/home" element={<Dashboard />} />
         </Route>
       </Routes>
       </UserProvider>
