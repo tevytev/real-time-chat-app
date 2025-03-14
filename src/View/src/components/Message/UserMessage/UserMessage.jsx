@@ -7,7 +7,7 @@ export default function UserMessage(props) {
     <>
       <div className={image ? "user-image-message-body" : "user-message-body"}>
         {image ? (
-          <img className="received-message-image" src={image}></img>
+          <img className="message-image" src={image}></img>
         ) : (
           <p>{text}</p>
         )}

@@ -1,12 +1,12 @@
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import "./ChatBox.css";
 import axios from "../../../../api/axios";
 import io from "socket.io-client";
 const USER_URL = "/api/user/";
 const MESSAGE_URL = "/api/message/";
 
-// Websocket
-const socket = io("http://localhost:5432/", { transports: ["websocket"] });
+// // Websocket
+// const socket = io("http://localhost:5432/", { transports: ["websocket"] });
 
 export default function ChatBox(props) {
   const {
@@ -27,6 +27,9 @@ export default function ChatBox(props) {
   const [pfp, setPfp] = useState(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
+  // Reference to Websocket
+  const socketRef = useRef(null);
+
   useEffect(() => {
     // Function to update window width state
     const handleResize = () => {
@@ -41,10 +44,21 @@ export default function ChatBox(props) {
     };
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    // Websocket
+    socketRef.current = io("http://localhost:5432/", {
+      transports: ["websocket"],
+    });
+
+    return () => {
+      socketRef.current.disconnect(); // Clean up socket connection when component unmounts
+    };
+  }, []);
+
+  useEffect(() => {
     setLastMessage("");
     setUnreadCount(0);
-    socket.emit("joinRoom", roomId);
+    socketRef.current.emit("joinRoom", roomId);
   }, [user, roomId]);
 
   useEffect(() => {
@@ -58,7 +72,7 @@ export default function ChatBox(props) {
         });
 
         setRoomUser(response.data);
-        setPfp(response.data.profilePic);
+        if (response.data.profilePic) setPfp(response.data.profilePic);
       } catch (error) {
         console.log(error);
       }
@@ -136,21 +150,30 @@ export default function ChatBox(props) {
   // Websocket effect to update messages state in real-time
   useEffect(() => {
     // Listen for the 'message' event from the server
-    socket.on("receiveMessage", (data) => {
+    socketRef.current.on("receiveMessage", (data) => {
       // Update the messages state with the new message if the new message is from chatbox users
+      console.log(data.room);
+      console.log(activeRoomId);
       if (data.room === roomId) {
-        setLastMessage(data);
-        if (activeRoomId !== roomId && unreadCount !== "+9") {
-          if (unreadCount === 9) setUnreadCount("+9");
-          else setUnreadCount((prevCount) => prevCount + 1);
+        // if user is currently in room when they receive a new message set messages as read;
+        if (activeRoomId === roomId) {
+          handleReadMessages();
+          setLastMessage(data);
+          setUnreadCount(0);
+        } else {
+          setLastMessage(data);
+          if (activeRoomId !== roomId && unreadCount !== "+9") {
+            if (unreadCount === 9) setUnreadCount("+9");
+            else setUnreadCount((prevCount) => prevCount + 1);
+          }
         }
       }
     });
 
     return () => {
-      socket.off("receiveMessage"); // Clean up when the component unmounts
+      socketRef.current.off("receiveMessage"); // Clean up when the component unmounts
     };
-  }, [socket]);
+  }, [activeRoomId]);
 
   const handleReadMessages = async () => {
     try {
@@ -163,7 +186,6 @@ export default function ChatBox(props) {
 
       if (response.status === 200) {
         setUnreadCount(0);
-        // console.log(response);
       }
     } catch (error) {
       console.log(error);

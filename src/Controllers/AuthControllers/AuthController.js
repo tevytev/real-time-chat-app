@@ -62,7 +62,7 @@ const registerUser = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true, // cookie is not accessible via Javascript
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax", // or 'Lax' for less strict behavior
+      sameSite: "lax", // or 'Lax' for less strict behavior
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "localhost",
     });
@@ -109,10 +109,13 @@ const loginUser = async (req, res) => {
       domain: "localhost",
     });
 
+    // 60 * 60 * 1000 FOR 15 MINUTES
+    // 60 * 1000 1 MINUTE
+
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true, // cookie is not accessible via Javascript
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax", // or 'Lax' for less strict behavior
+      sameSite: "lax", // or 'Lax' for less strict behavior
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "localhost",
     });
@@ -185,20 +188,17 @@ const refresh = async (req, res) => {
     const newRefreshToken = generateRefreshToken(payload);
 
     // Update refresh token in database
-    await RefreshToken.findOneAndUpdate(
+    const newRefreshCollection =  await RefreshToken.findOneAndUpdate(
       { token: refreshTokenFromCookie },
       { token: newRefreshToken },
       { new: true }
     );
 
-    // storedRefreshToken.token = newRefreshToken;
-    // await storedRefreshToken.save();
-
     // Set and send new refresh token cookie and access token
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true, // cookie is not accessible via Javascript
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax", // or 'Lax' for less strict behavior
+      sameSite: "lax", // or 'Lax' for less strict behavior
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "localhost",
     });

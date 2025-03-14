@@ -48,7 +48,13 @@ export default function Header(props) {
         navigate("/register");
       }
     } catch (error) {
-      console.log(error);
+      // if (!error?.response) {
+      //   console.log("No server response");
+      // } else if (error.response?.status === 400) {
+      //   localStorage.removeItem("user");
+      //   localStorage.removeItem("family");
+      //   navigate("/register");
+      // }
     }
   };
 

@@ -49,13 +49,13 @@ export default function UserStatusCard(props) {
         setEdit(false);
       }
     } catch (error) {
-      if (!error?.response) {
-        console.log("No server response");
-      } else if (error.response?.status === 401) {
-        localStorage.removeItem("user");
-        localStorage.removeItem("family");
-        navigate("/register");
-      }
+      // if (!error?.response) {
+      //   console.log("No server response");
+      // } else if (error.response?.status === 401) {
+      //   localStorage.removeItem("user");
+      //   localStorage.removeItem("family");
+      //   navigate("/register");
+      // }
     }
   }
 

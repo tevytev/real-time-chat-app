@@ -23,7 +23,7 @@ export const UserProvider = ({ children }) => {
         fetchFamily();
       }
     }
-  }, []);
+  }, [activeTab]);
 
   useEffect(() => {
     const fetchedFamily = localStorage.getItem("family");
@@ -37,12 +37,19 @@ export const UserProvider = ({ children }) => {
     }
   }, [user, family]);
 
+  useEffect(() => {
+    if (family.members) {
+      if (rooms.length >= family.members.length) {
+        fetchFamily();
+      }
+    }
+  }, [rooms]);
+
   // Fetch family function as fallback if family data is not located in local storage
   const fetchFamily = async () => {
     try {
       const response = await axios.get(
-        `${FAMILY_URL}${user.familyId}`,
-        JSON.stringify(getFormData),
+        `${FAMILY_URL}${family.familyId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -79,6 +86,31 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  const getRefreshToken = async (request) => {
+    
+    try {
+      const response = await axios.post("/api/auth/refresh", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+
+      // If new access token and refresh token is successfully created retry request
+      if (response.status === 200) {
+        request();
+      }
+    } catch (error) {
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 403) {
+        localStorage.removeItem("user");
+          localStorage.removeItem("family");
+          navigate("/register");
+      }
+    }
+  }
+
   return (
     <UserContext.Provider
       value={{
@@ -92,6 +124,7 @@ export const UserProvider = ({ children }) => {
         setActiveTab,
         creator,
         setCreator,
+        getRefreshToken
       }}
     >
       {children}

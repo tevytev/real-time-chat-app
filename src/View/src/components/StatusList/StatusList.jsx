@@ -6,7 +6,7 @@ const FAMILY_URL = "/api/family/";
 import "./StatusList.css";
 
 export default function StatusList(props) {
-  const { family, activeTab, setActiveTab } = useContext(UserContext);
+  const { family, activeTab, setActiveTab, getRefreshToken } = useContext(UserContext);
 
   const { setActiveRoomId } = props;
 
@@ -37,9 +37,11 @@ export default function StatusList(props) {
         if (!error?.response) {
           console.log("No server response");
         } else if (error.response?.status === 401) {
-          localStorage.removeItem("user");
-          localStorage.removeItem("family");
-          navigate("/register");
+          getRefreshToken(fetchStatusCards);
+          
+          // localStorage.removeItem("user");
+          // localStorage.removeItem("family");
+          // navigate("/register");
         }
       }
     };

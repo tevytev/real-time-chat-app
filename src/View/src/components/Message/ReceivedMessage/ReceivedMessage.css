@@ -12,7 +12,8 @@
   justify-content: center;
   align-items: center;
   background-color: var(--primary);
-  height: 30px;
+  min-height: 30px;
+  min-width: 30px;
   aspect-ratio: 1 / 1;
   border-radius: 100px;
   overflow: hidden;
@@ -23,14 +24,14 @@
   height: auto;
 }
 
-.recieved-message-body-container {
+.received-message-body-container {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   gap: 5px;
-  width: auto;
-  max-width: 50%;
+  width: 100%;
+  /* max-width: 50%; */
   color: var(--black);
   font-weight: 300;
 }
@@ -39,7 +40,7 @@
   font-size: .8rem;
 }
 
-.recieved-livingRoom-message-body {
+.received-livingRoom-message-body {
   height: auto;
   background-color: var(--primary);
   color: var(--white);
@@ -52,7 +53,7 @@
   position: relative;
 }
 
-.recieved-message-body {
+.received-message-body {
   height: auto;
   max-width: 50%;
   background-color: var(--primary);
@@ -68,13 +69,11 @@
   word-wrap: break-word;
 }
 
-.recieved-image-message-body {
-  height: fit-content;
+.received-image-message-body {
+  height: auto;
   max-width: 50%;
   width:fit-content;
-  /* background-color: var(--primary); */
   color: var(--white);
-  /* padding: .5rem; */
   border-radius: 5px 20px 20px 20px;
   margin-right: auto;
   margin-left: 0;
@@ -92,7 +91,7 @@
   font-size: .8rem;
 }
 
-.message-image {
+.received-message-image {
   width: 100%;
   height: auto;
   border-radius: 5px 20px 20px 20px;
@@ -106,8 +105,8 @@
 }
 
 @media screen and (max-width: 768px) {
-  .recieved-image-message-body {
-    max-width: 60%;
+  .received-image-message-body {
+    max-width: 75%;
   }
 
   .message-timestamp {

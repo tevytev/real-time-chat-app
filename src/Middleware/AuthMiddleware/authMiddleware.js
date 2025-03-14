@@ -3,16 +3,16 @@ require("dotenv").config();
 
 const verifyAccessToken = (req, res, next) => {
   // Get token from request header
-  // const token = req.headers["authorization"]?.split(" ")[1];
-  const refreshTokenFromCookie = req.cookies.access_token;
+  const accessTokenFromCookie = req.cookies.access_token;
+  const refreshTokenFromCookie = req.cookies.refreshToken;
 
   // If no token is found, return 401 unauthorized
-  if (!refreshTokenFromCookie) {
+  if (!accessTokenFromCookie) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   // Verify the token using jsonwebtoken library
-  jwt.verify(refreshTokenFromCookie, process.env.JWT_ACCESS_SECRET, (error, decoded) => {
+  jwt.verify(accessTokenFromCookie, process.env.JWT_ACCESS_SECRET, (error, decoded) => {
     if (error) {
       console.log(error);
       return res.status(403).json({ message: "Invalid token" });

@@ -15,7 +15,7 @@ const MESSAGE_URL = "/api/message/";
 const ROOM_URL = "/api/room/";
 
 // Websocket
-const socket = io("http://localhost:5432/", { transports: ["websocket"] });
+// const socket = io("http://localhost:5432/", { transports: ["websocket"] });
 
 export default function LivingRoom() {
   const { user, family, activeTab } = useContext(UserContext);
@@ -37,6 +37,8 @@ export default function LivingRoom() {
 
   // Reference to chat window
   const chatWindowRef = useRef(null);
+  // Reference to Websocket
+  const socketRef = useRef(null);
 
   // Update scroll position when the element is scrolled
   const handleScroll = () => {
@@ -45,6 +47,15 @@ export default function LivingRoom() {
       setScrollPosition(scrollTop); // Update scroll position state
     }
   };
+  
+  // useEffect(() => {
+  //   // Websocket
+  //   const socket = io("http://localhost:5432/", { transports: ["websocket"] });
+
+  //   return () => {
+  //     socket.disconnect(); // Clean up socket connection when component unmounts
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (chatWindowRef.current) {
@@ -89,13 +100,13 @@ export default function LivingRoom() {
           setActiveRoomUsers(activeUsers);
         }
       } catch (error) {
-        if (!error?.response) {
-          console.log("No server response");
-        } else if (error.response?.status === 401) {
-          localStorage.removeItem("user");
-          localStorage.removeItem("family");
-          navigate("/register");
-        }
+        // if (!error?.response) {
+        //   console.log("No server response");
+        // } else if (error.response?.status === 401) {
+        //   localStorage.removeItem("user");
+        //   localStorage.removeItem("family");
+        //   navigate("/register");
+        // }
       }
     };
 
@@ -116,17 +127,17 @@ export default function LivingRoom() {
           setLoadingMessages(false);
         }
       } catch (error) {
-        if (!error?.response) {
-          console.log("No server response");
-        } else if (error.response?.status === 401) {
-          localStorage.removeItem("user");
-          localStorage.removeItem("family");
-          navigate("/register");
-        }
+        // if (!error?.response) {
+        //   console.log("No server response");
+        // } else if (error.response?.status === 401) {
+        //   localStorage.removeItem("user");
+        //   localStorage.removeItem("family");
+        //   navigate("/register");
+        // }
       }
     };
 
-    socket.emit("joinRoom", family.livingRoomId);
+    // socket.emit("joinRoom", family.livingRoomId);
 
     fetchRoomUsers(), fetchMessages();
   }, [activeTab]);
@@ -168,8 +179,13 @@ export default function LivingRoom() {
 
   // Websocket effect to update messages state in real-time
   useEffect(() => {
+    // Websocket
+    socketRef.current = io("http://localhost:5432/", { transports: ["websocket"] });
+
+    socketRef.current.emit("joinRoom", family.livingRoomId);
+
     // Listen for the 'message' event from the server
-    socket.on("receiveMessage", (data) => {
+    socketRef.current.on("receiveMessage", (data) => {
       console.log("Received message from server:", data);
 
       // Update the messages state with the new message
@@ -180,9 +196,10 @@ export default function LivingRoom() {
     });
 
     return () => {
-      socket.off("receiveMessage"); // Clean up when the component unmounts
+      socketRef.current.off("receiveMessage"); // Clean up when the component unmounts
+      socketRef.current.disconnect(); // Clean up socket connection when component unmounts
     };
-  }, [socket]);
+  }, []);
 
   // Scroll to bottom of chat window when message is sent/received or the user switches chats
   useEffect(() => {
@@ -244,7 +261,7 @@ export default function LivingRoom() {
         // created message to send to websocket
         const createdMessage = response.data.message;
         // emit message to all active room users
-        socket.emit("sendMessage", family.livingRoomId, createdMessage);
+        socketRef.current.emit("sendMessage", family.livingRoomId, createdMessage);
         // clear input
         setMessageToSend("");
       }
@@ -279,7 +296,7 @@ export default function LivingRoom() {
         // created message to send to websocket
         const createdMessage = response.data.message;
         // emit message to all active room users
-        socket.emit("sendMessage", family.livingRoomId, createdMessage);
+        socketRef.current.emit("sendMessage", family.livingRoomId, createdMessage);
         // clear input
         setImageToSend(null);
         setInputImage(null);
@@ -338,12 +355,6 @@ export default function LivingRoom() {
                         username = activeRoomUsers[i].firstName;
                         pfp = activeRoomUsers[i].profilePic;
                       }
-                    }
-
-                    if (username === "") {
-                      try {
-                        const getUser = async () => {};
-                      } catch (error) {}
                     }
 
                     return (

@@ -15,7 +15,7 @@ const MESSAGE_URL = "/api/message/";
 const ROOM_URL = "/api/room/";
 
 // Websocket
-const socket = io("http://localhost:5432/", { transports: ["websocket"] });
+// const socket = io("http://localhost:5432/", { transports: ["websocket"] });
 
 export default function ChatRoom(props) {
   const { activeRoomId, loadingRooms, fetchRooms } = props;
@@ -39,6 +39,8 @@ export default function ChatRoom(props) {
 
   // Reference to chat window
   const chatWindowRef = useRef(null);
+  // Reference to Websocket
+  const socketRef = useRef(null);
 
   // Update scroll position when the element is scrolled
   const handleScroll = () => {
@@ -105,6 +107,29 @@ export default function ChatRoom(props) {
     return () => {};
   }, [scrollPosition]);
 
+
+  // Websocket effect to update messages state in real-time
+  useEffect(() => {
+    // Websocket
+    socketRef.current = io("http://localhost:5432/", { transports: ["websocket"] });
+
+    // Listen for the 'message' event from the server
+    socketRef.current.on("receiveMessage", (data) => {
+      console.log("Received message from server:", data);
+
+      // Update the messages state with the new message
+      setNewMessages((prevMessages) => [
+        ...prevMessages,
+        data, // Append the new message object
+      ]);
+    });
+
+    return () => {
+      socketRef.current.off("receiveMessage"); // Clean up when the component unmounts
+      socketRef.current.disconnect(); // Clean up socket connection when component unmounts
+    };
+  }, []);
+
   // Fetch all room users and messages
   useEffect(() => {
     // reset skip for fetching old messages
@@ -149,29 +174,20 @@ export default function ChatRoom(props) {
     };
 
     if (activeRoomId !== null) {
-      socket.emit("joinRoom", activeRoomId);
+      socketRef.current.emit("joinRoom", activeRoomId);
     }
 
     if (activeRoomId) fetchRoomUsers(), fetchMessages();
   }, [activeRoomId]);
 
-  // Websocket effect to update messages state in real-time
-  useEffect(() => {
-    // Listen for the 'message' event from the server
-    socket.on("receiveMessage", (data) => {
-      console.log("Received message from server:", data);
+  // useEffect(() => {
+  //   // Websocket
+  //   const socket = io("http://localhost:5432/", { transports: ["websocket"] });
 
-      // Update the messages state with the new message
-      setNewMessages((prevMessages) => [
-        ...prevMessages,
-        data, // Append the new message object
-      ]);
-    });
-
-    return () => {
-      socket.off("receiveMessage"); // Clean up when the component unmounts
-    };
-  }, [socket]);
+  //   return () => {
+  //     socket.disconnect(); // Clean up socket connection when component unmounts
+  //   }
+  // }, []);
 
   // Scroll to bottom of chat window when message is sent/received or the user switches chats
   useEffect(() => {
@@ -253,7 +269,7 @@ export default function ChatRoom(props) {
         // created message to send to websocket
         const createdMessage = response.data.message;
         // emit message to all active room users
-        socket.emit("sendMessage", activeRoomId, createdMessage);
+        socketRef.current.emit("sendMessage", activeRoomId, createdMessage);
         // clear input
         setMessageToSend("");
       }
@@ -288,7 +304,7 @@ export default function ChatRoom(props) {
         // created message to send to websocket
         const createdMessage = response.data.message;
         // emit message to all active room users
-        socket.emit("sendMessage", activeRoomId, createdMessage);
+        socketRef.current.emit("sendMessage", activeRoomId, createdMessage);
         // clear input
         setImageToSend(null);
         setInputImage(null);
@@ -321,7 +337,7 @@ export default function ChatRoom(props) {
                   <p></p>
                 ) : (
                   <p>
-                    (Currently not in family){" "}
+                    (Currently not in family)
                     <i className="fa-solid fa-person-circle-xmark"></i>
                   </p>
                 )}
