@@ -55,8 +55,8 @@ const registerUser = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
       sameSite: "lax", // or 'Lax' for less strict behavior
-      maxAge: 60 * 60 * 1000, // e.g., 15 minutes expiration
-      domain: "localhost",
+      maxAge: 60 * 60 * 1000, // 1 hour until exp
+      domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
 
     res.cookie("refreshToken", refreshToken, {
@@ -64,7 +64,7 @@ const registerUser = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax", // or 'Lax' for less strict behavior
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
-      domain: "localhost",
+      domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
 
     return res.status(201).json({ newUser });
@@ -105,8 +105,8 @@ const loginUser = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
       sameSite: "lax", // or 'Lax' for less strict behavior
-      maxAge: 60 * 60 * 1000, // e.g., 15 minutes expiration
-      domain: "localhost",
+      maxAge: 60 * 60 * 1000, // 1 hour until exp
+      domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
 
     // 60 * 60 * 1000 FOR 15 MINUTES
@@ -117,7 +117,7 @@ const loginUser = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax", // or 'Lax' for less strict behavior
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
-      domain: "localhost",
+      domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
 
     res.status(200).json({ user });
@@ -200,15 +200,15 @@ const refresh = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax", // or 'Lax' for less strict behavior
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
-      domain: "localhost",
+      domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
 
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
       sameSite: "lax", // or 'Lax' for less strict behavior
-      maxAge: 60 * 60 * 1000, // e.g., 15 minutes expiration
-      domain: "localhost",
+      maxAge: 60 * 60 * 1000, // 1 hour until exp
+      domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
     res.status(200).json({ user });
   } catch (error) {
