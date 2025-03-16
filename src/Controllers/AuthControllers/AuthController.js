@@ -53,16 +53,16 @@ const registerUser = async (req, res) => {
     // Set and send new refresh token cookie and access token
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
-      sameSite: "lax", // or 'Lax' for less strict behavior
+      secure: true,
+      sameSite: "None",
       maxAge: 60 * 60 * 1000, // 1 hour until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
 
     res.cookie("refreshToken", refreshToken, {
-      httpOnly: true, // cookie is not accessible via Javascript
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax", // or 'Lax' for less strict behavior
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
@@ -103,8 +103,8 @@ const loginUser = async (req, res) => {
     // Set and send new refresh token cookie and access token
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
-      sameSite: "lax", // or 'Lax' for less strict behavior
+      secure: true,
+      sameSite: "None",
       maxAge: 60 * 60 * 1000, // 1 hour until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
@@ -113,9 +113,9 @@ const loginUser = async (req, res) => {
     // 60 * 1000 1 MINUTE
 
     res.cookie("refreshToken", refreshToken, {
-      httpOnly: true, // cookie is not accessible via Javascript
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax", // or 'Lax' for less strict behavior
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
@@ -147,8 +147,8 @@ const logoutUser = async (req, res) => {
 
     res.clearCookie("access_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "None",
       path: "/",
     });
 
@@ -196,17 +196,17 @@ const refresh = async (req, res) => {
 
     // Set and send new refresh token cookie and access token
     res.cookie("refreshToken", newRefreshToken, {
-      httpOnly: true, // cookie is not accessible via Javascript
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax", // or 'Lax' for less strict behavior
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
 
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
-      sameSite: "lax", // or 'Lax' for less strict behavior
+      secure: true,
+      sameSite: "None",
       maxAge: 60 * 60 * 1000, // 1 hour until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
