@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // ["http://localhost:5173/"]
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "https://real-time-chat-app-rwiy.onrender.com",
   methods: ["POST", "PUT", "GET", "DELETE", "OPTIONS", "HEAD"],
   credentials: true,
   optionSuccessStatus: 200,
@@ -35,7 +35,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173'); // Allow your origin
+  res.header('Access-Control-Allow-Origin', 'https://real-time-chat-app-rwiy.onrender.com'); // Allow your origin
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD'); // Allow methods
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Set-Cookie, withCredentials'); // Allow headers
   res.header('Access-Control-Allow-Credentials', 'true'); // Allow credentials (cookies, headers)
