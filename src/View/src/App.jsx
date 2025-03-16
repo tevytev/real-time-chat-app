@@ -7,21 +7,19 @@ import Dashboard from "./routes/dashboard/Dashboard";
 import FamilySetup from "./routes/familySetup/FamilySetup";
 const URL = "/api/message/67738646d80c810aa89bda41";
 
-function App() {
+export default function App() {
 
   return (
     <>
     <UserProvider>
       <Routes>
         <Route path="/" element={<Root />}>
-          <Route path="/register" element={<Auth />} />
-          <Route path="/familysetup" element={<FamilySetup />} />
-          <Route path="/home" element={<Dashboard />} />
+          <Route path="register" element={<Auth />} />
+          <Route path="familysetup" element={<FamilySetup />} />
+          <Route path="home" element={<Dashboard />} />
         </Route>
       </Routes>
       </UserProvider>
     </>
   );
-}
-
-export default App;
+};
