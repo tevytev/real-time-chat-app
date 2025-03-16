@@ -180,7 +180,7 @@ export default function LivingRoom() {
   // Websocket effect to update messages state in real-time
   useEffect(() => {
     // Websocket
-    socketRef.current = io("http://localhost:5432/", { transports: ["websocket"] });
+    socketRef.current = io("https://real-time-chat-app-rwiy.onrender.com", { transports: ["websocket"] });
 
     socketRef.current.emit("joinRoom", family.livingRoomId);
 
