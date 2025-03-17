@@ -290,6 +290,7 @@
   padding: 1rem 0;
   background-color: var(--primary);
   border: solid 2px var(--primary);
+  color: var(--white);
   border-radius: 99999px;
   cursor: pointer;
   transition: all 100ms ease-out;

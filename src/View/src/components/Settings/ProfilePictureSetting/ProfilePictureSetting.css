@@ -63,6 +63,7 @@
 .setting-btn {
   background-color: var(--primary);
   border: solid 2px var(--primary);
+  color: var(--white);
   width: 100%;
   padding: 1rem 0;
   border-radius: 99999px;
@@ -73,6 +74,7 @@
 .upload-btn {
   background-color: var(--primary);
   border: solid 2px var(--primary);
+  color: var(--white);
   width: 100%;
   padding: 1rem 0;
   border-radius: 99999px;

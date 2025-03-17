@@ -136,6 +136,7 @@
   border-radius: 5px;
   width: auto;
   background-color: var(--primary);
+  color: var(--white);
   border: none;
   position: relative;
   outline: none;
@@ -144,6 +145,7 @@
 .status-btn {
   background-color: var(--primary);
   border: solid 2px var(--primary);
+  color: var(--white);
   width: 100%;
   padding: 1rem 0;
   border-radius: 99999px;
