@@ -46,7 +46,7 @@ export default function ChatBox(props) {
 
   useEffect(() => {
     // Websocket
-    socketRef.current = io("https://real-time-chat-app-rwiy.onrender.com", {
+    socketRef.current = io("https://real-time-chat-app-server-6rxf.onrender.com", {
       transports: ["websocket"],
     });
 

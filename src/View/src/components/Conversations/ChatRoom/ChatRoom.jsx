@@ -111,7 +111,7 @@ export default function ChatRoom(props) {
   // Websocket effect to update messages state in real-time
   useEffect(() => {
     // Websocket
-    socketRef.current = io("https://real-time-chat-app-rwiy.onrender.com", { transports: ["websocket"] });
+    socketRef.current = io("https://real-time-chat-app-server-6rxf.onrender.com", { transports: ["websocket"] });
 
     // Listen for the 'message' event from the server
     socketRef.current.on("receiveMessage", (data) => {
