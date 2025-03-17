@@ -54,7 +54,7 @@ const registerUser = async (req, res) => {
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 60 * 60 * 1000, // 1 hour until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
@@ -62,7 +62,7 @@ const registerUser = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
@@ -104,7 +104,7 @@ const loginUser = async (req, res) => {
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 60 * 60 * 1000, // 1 hour until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
@@ -115,7 +115,7 @@ const loginUser = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "lax", 
+      sameSite: "none", 
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
@@ -147,8 +147,8 @@ const logoutUser = async (req, res) => {
 
     res.clearCookie("access_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: true,
+      sameSite: "none",
       path: "/",
     });
 
@@ -198,7 +198,7 @@ const refresh = async (req, res) => {
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
@@ -206,7 +206,7 @@ const refresh = async (req, res) => {
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 60 * 60 * 1000, // 1 hour until exp
       domain: "real-time-chat-app-server-6rxf.onrender.com",
     });
