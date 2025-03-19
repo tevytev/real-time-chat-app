@@ -24,10 +24,6 @@ const createRoom = async (req, res) => {
   }
 };
 
-const deleteRoom = async (req, res) => {
-  
-}
-
 const getActiveRoomUsers = async (req, res) => {
   const { id } = req.user;
   const { roomId } = req.params;
@@ -48,7 +44,8 @@ const getActiveRoomUsers = async (req, res) => {
     res.status(200).json({ users: users });
 
   } catch (error) {
-    console.log();
+    console.error("Error fetching room users:", error);
+    res.status(500).json({ message: "Failed to fetch room users" });
   }
 }
 
@@ -78,7 +75,8 @@ const getAllRooms = async (req, res) => {
     res.status(200).json(rooms);
     
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching rooms:", error);
+    res.status(500).json({ message: "Failed to fetch rooms" });
   }
 };
 
@@ -102,7 +100,8 @@ const getLivingRommActiveUsers = async (req, res) => {
     res.status(200).json({ users: users });
 
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching livingroom users:", error);
+    res.status(500).json({ message: "Failed to fetch livingroom users" });
   }
 }
 

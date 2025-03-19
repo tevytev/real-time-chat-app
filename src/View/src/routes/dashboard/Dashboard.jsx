@@ -17,7 +17,7 @@ export default function Dashboard() {
   // navigation function
   const navigate = useNavigate();
 
-  const { user, setUser, rooms, setRooms, activeTab, setActiveTab } =
+  const { user, setUser, rooms, setRooms, activeTab } =
     useContext(UserContext);
 
   const [activeRoomId, setActiveRoomId] = useState(null);
@@ -74,13 +74,16 @@ export default function Dashboard() {
         setRooms(roomData);
       }
     } catch (error) {
-      // if (!error?.response) {
-      //   console.log("No server response");
-      // } else if (error.response?.status === 401) {
-      //   localStorage.removeItem("user");
-      //   localStorage.removeItem("family");
-      //   navigate("/register");
-      // }
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        getRefreshToken(fetchRooms);
+      } else if (error.response?.status === 500) {
+        setLoadingRooms(true);
+        alert("Server error has occured: Error loading rooms");
+      } else {
+        console.error("An error occured:", error);
+      }
     }
   };
 

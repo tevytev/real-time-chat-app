@@ -7,7 +7,7 @@ const USER_STATUS_URL = "/api/user/"
 
 export default function UserStatus() {
 
-  const { user, setUser, rooms, setRooms, activeTab } =
+  const { user, getRefreshToken } =
     useContext(UserContext);
 
   const [mood, setMood] = useState(null);
@@ -36,7 +36,15 @@ export default function UserStatus() {
           setThoughts(statusData.thoughts);
         }
       } catch (error) {
-        console.log(error);
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          getRefreshToken(fetchUserStatus);
+        } else if (error.response?.status === 500) {
+          console.log("Server error has occured: Error fetching user status");
+        } else {
+          console.error("An error occured:", error);
+        }
       }
     }
 

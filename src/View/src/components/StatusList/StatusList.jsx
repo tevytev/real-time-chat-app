@@ -6,7 +6,7 @@ const FAMILY_URL = "/api/family/";
 import "./StatusList.css";
 
 export default function StatusList(props) {
-  const { family, activeTab, setActiveTab, getRefreshToken } = useContext(UserContext);
+  const { family, setActiveTab, getRefreshToken } = useContext(UserContext);
 
   const { setActiveRoomId } = props;
 
@@ -38,10 +38,11 @@ export default function StatusList(props) {
           console.log("No server response");
         } else if (error.response?.status === 401) {
           getRefreshToken(fetchStatusCards);
-          
-          // localStorage.removeItem("user");
-          // localStorage.removeItem("family");
-          // navigate("/register");
+        } else if (error.response?.status === 500) {
+          setLoadingCards(true);
+          alert("Server error has occured: Failed to load statuses");
+        } else {
+          console.error("An error occured:", error);
         }
       }
     };
@@ -99,7 +100,7 @@ export default function StatusList(props) {
             <h2>{family.familyName} Family</h2>
           </div>
           <div className="empty-status-list-container">
-            <p>No status' to show, you need family members.</p>
+            <p>No statuses to show, you need family members.</p>
           </div>
         </section>
       </>

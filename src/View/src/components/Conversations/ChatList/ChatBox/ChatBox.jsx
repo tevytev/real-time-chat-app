@@ -18,6 +18,7 @@ export default function ChatBox(props) {
     upadtedAt,
     user,
     searchTerm,
+    getRefreshToken
   } = props;
 
   const [roomUser, setRoomUser] = useState(null);
@@ -74,7 +75,15 @@ export default function ChatBox(props) {
         setRoomUser(response.data);
         if (response.data.profilePic) setPfp(response.data.profilePic);
       } catch (error) {
-        console.log(error);
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          getRefreshToken(fetchRoomUser);
+        } else if (error.response?.status === 500) {
+          console.log("Server error has occured: Error fetching user");
+        } else {
+          console.error("An error occured:", error);
+        }
       }
     };
 
@@ -140,7 +149,16 @@ export default function ChatBox(props) {
           }
         }
       } catch (error) {
-        console.log(error);
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          getRefreshToken(fetchRecentMessages);
+        } else if (error.response?.status === 500) {
+          setLoadingMessages(true);
+          console.log("Server error has occured: Error fetching recent message");
+        } else {
+          console.error("An error occured:", error);
+        }
       }
     };
 
@@ -188,7 +206,15 @@ export default function ChatBox(props) {
         setUnreadCount(0);
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        getRefreshToken(handleReadMessages);
+      } else if (error.response?.status === 500) {
+        console.log("Server error has occured: Error fetching user");
+      } else {
+        console.error("An error occured:", error);
+      }
     }
   };
 
@@ -299,11 +325,6 @@ export default function ChatBox(props) {
             <div className="chatbox-text-container">
               <h1>{roomUser.firstName}</h1>
               <p className={unreadCount ? "bold-lastmsg" : ""}>
-                {/* {lastMessage
-                  ? lastMessage.content
-                    ? lastMessage.content
-                    : "Sent an image"
-                  : ""} */}
                 {lastMessage !== ""
                   ? lastMessage.content
                     ? lastMessage.content

@@ -85,7 +85,7 @@ export const UserProvider = ({ children }) => {
       }
     }
   };
-
+  // Request new access token and refresh token for user when access token has expired
   const getRefreshToken = async (request) => {
     
     try {
@@ -96,7 +96,7 @@ export const UserProvider = ({ children }) => {
         withCredentials: true,
       });
 
-      // If new access token and refresh token is successfully created retry request
+      // If new access token and refresh token is successfully created, retry request
       if (response.status === 200) {
         request();
       }
@@ -105,8 +105,8 @@ export const UserProvider = ({ children }) => {
         console.log("No server response");
       } else if (error.response?.status === 403) {
         localStorage.removeItem("user");
-          localStorage.removeItem("family");
-          navigate("/register");
+        localStorage.removeItem("family");
+        navigate("/register");
       }
     }
   }

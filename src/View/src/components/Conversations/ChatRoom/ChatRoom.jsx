@@ -20,7 +20,7 @@ const ROOM_URL = "/api/room/";
 export default function ChatRoom(props) {
   const { activeRoomId, loadingRooms, fetchRooms } = props;
 
-  const { user, family, activeTab } = useContext(UserContext);
+  const { user, family, getRefreshToken } = useContext(UserContext);
 
   const [activeRoomUsers, setActiveRoomUsers] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -97,7 +97,16 @@ export default function ChatRoom(props) {
             setSkip((prev) => prev + 20);
           }
         } catch (error) {
-          console.log(error);
+          if (!error?.response) {
+            console.log("No server response");
+          } else if (error.response?.status === 401) {
+            getRefreshToken(fetchMoreMessages);
+          } else if (error.response?.status === 500) {
+            setLoadingMoreMessages(true);
+            alert("Server error has occured: Error fetching more messages");
+          } else {
+            console.error("An error occured:", error);
+          }
         }
       };
 
@@ -125,8 +134,9 @@ export default function ChatRoom(props) {
     });
 
     return () => {
-      socketRef.current.off("receiveMessage"); // Clean up when the component unmounts
-      socketRef.current.disconnect(); // Clean up socket connection when component unmounts
+      // Clean up socket connections
+      socketRef.current.off("receiveMessage");
+      socketRef.current.disconnect();
     };
   }, []);
 
@@ -151,7 +161,16 @@ export default function ChatRoom(props) {
           setActiveRoomUsers(filteredUsers);
         }
       } catch (error) {
-        console.log(error);
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          getRefreshToken(fetchRoomUsers);
+        } else if (error.response?.status === 500) {
+          setLoadingMessages(true);
+          alert("Server error has occured: error fetching users");
+        } else {
+          console.error("An error occured:", error);
+        }
       }
     };
 
@@ -169,7 +188,16 @@ export default function ChatRoom(props) {
           setLoadingMessages(false);
         }
       } catch (error) {
-        console.log(error);
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          getRefreshToken(fetchMessages);
+        } else if (error.response?.status === 500) {
+          setLoadingMessages(true);
+          alert("Server error has occured: Error fetching messages");
+        } else {
+          console.error("An error occured:", error);
+        }
       }
     };
 
@@ -179,15 +207,6 @@ export default function ChatRoom(props) {
 
     if (activeRoomId) fetchRoomUsers(), fetchMessages();
   }, [activeRoomId]);
-
-  // useEffect(() => {
-  //   // Websocket
-  //   const socket = io("http://localhost:5432/", { transports: ["websocket"] });
-
-  //   return () => {
-  //     socket.disconnect(); // Clean up socket connection when component unmounts
-  //   }
-  // }, []);
 
   // Scroll to bottom of chat window when message is sent/received or the user switches chats
   useEffect(() => {
@@ -200,9 +219,6 @@ export default function ChatRoom(props) {
   }, [newMessages]);
 
   useLayoutEffect(() => {
-    // if (chatWindowRef.current) {
-    //   chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
-    // }
 
     const scrollToBottom = () => {
       if (chatWindowRef.current) {
@@ -274,7 +290,17 @@ export default function ChatRoom(props) {
         setMessageToSend("");
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        getRefreshToken(handleSendMessage);
+      } else if (error.response?.status === 500) {
+        alert("Server error has occured: Failed to send message, try again");
+        // clear input
+        setMessageToSend("");
+      } else {
+        console.error("An error occured:", error);
+      }
     }
   };
 
@@ -310,7 +336,18 @@ export default function ChatRoom(props) {
         setInputImage(null);
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        getRefreshToken(handleSendImageMessage);
+      } else if (error.response?.status === 500) {
+        alert("Server error has occured: Failed to send message, try agin");
+        // clear input
+        setImageToSend(null);
+        setInputImage(null);
+      } else {
+        console.error("An error occured:", error);
+      }
     }
   }
 

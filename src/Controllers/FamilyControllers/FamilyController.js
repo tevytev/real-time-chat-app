@@ -67,7 +67,8 @@ const getFamily = async (req, res) => {
 
     res.status(200).json(familyToSend);
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching family:", error);
+    res.status(500).json({ message: "Failed to fetch family" });
   }
 };
 
@@ -109,7 +110,8 @@ const getFamilyMembers = async (req, res) => {
       res.status(200).json(members);
     }
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching family members:", error);
+    res.status(500).json({ message: "Failed to fetch family members" });
   }
 };
 
@@ -264,7 +266,8 @@ const removeFamilyMember = async (req, res) => {
 
     res.status(200).json(familyToSend);
   } catch (error) {
-    console.log(error);
+    console.error("Error removing family member:", error);
+    res.status(500).json({ message: "Failed to remove family members" });
   }
 };
 
@@ -282,22 +285,13 @@ const getfamilyStatus = async (req, res) => {
       // If userId matching current user skip iteration
       if (id === members[i].toHexString()) continue;
 
-      console.log(members[i]);
-
       // Query family member status
       const status = await Status.findOne({ user: members[i] });
-
-      console.log(status);
 
       // Query room for current user and current family member
       const room = await Room.find({
         members: { $all: [id, members[i].toHexString()] },
       });
-
-      console.log(`this is the room :`);
-      console.log(room);
-
-      // console.log(room[0]._id);
 
       // Convert status to an object to append more essential information
       const statusToPush = status.toObject();
@@ -309,13 +303,13 @@ const getfamilyStatus = async (req, res) => {
       statusToPush.firstName = user.firstName;
       statusToPush.roomId = room[0]._id;
       statusToPush.profilePic = user.profilePic;
-      console.log(statusToPush);
       statusArray.push(statusToPush);
     }
 
     res.status(200).json(statusArray);
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching family statuses:", error);
+    res.status(500).json({ message: "Failed to fetch family statuses" });
   }
 };
 
@@ -342,7 +336,8 @@ const editFamily = async (req, res) => {
 
     res.status(200).json(familyToSend);
   } catch (error) {
-    console.log(error);
+    console.error("Error editing family info:", error);
+    res.status(500).json({ message: "Failed to edit family info" });
   }
 };
 
@@ -369,7 +364,8 @@ const changeCreator = async (req, res) => {
 
     res.status(200).json(familyToSend);
   } catch (error) {
-    console.log(error);
+    console.error("Error changing family creator:", error);
+    res.status(500).json({ message: "Failed to change family creator" });
   }
 };
 

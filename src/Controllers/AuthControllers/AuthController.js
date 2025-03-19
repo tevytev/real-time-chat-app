@@ -239,7 +239,8 @@ const changePassword = async (req, res) => {
     res.status(200).json({ message: "Success" });
     
   } catch (error) {
-    console.log(error);
+    console.error("Error changing password:", error);
+    res.status(500).json({ message: "Server error" });
   }
 }
 

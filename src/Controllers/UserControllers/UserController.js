@@ -14,7 +14,8 @@ const getUserStatus = async (req, res) => {
     const status = await Status.findOne({ user: userId });
     res.status(200).json(status);
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching user status:", error);
+    res.status(500).json({ message: "Failed to fetch user status" });
   }
 };
 
@@ -36,7 +37,8 @@ const updateUserStatus = async (req, res) => {
 
     res.status(200).json(newStatus);
   } catch (error) {
-    console.log(error);
+    console.error("Error updating user status:", error);
+    res.status(500).json({ message: "Failed to update user status" });
   }
 };
 
@@ -60,7 +62,8 @@ const updateUserInfo = async (req, res) => {
     
     res.status(200).json(newUser);
   } catch (error) {
-    console.log(error);
+    console.error("Error editing user info:", error);
+    res.status(500).json({ message: "Failed to update user info" });
   }
 };
 

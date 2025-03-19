@@ -55,7 +55,7 @@ const createMessage = async (req, res) => {
       res.status(201).json({ message: newMessage });
     }
   } catch (error) {
-    console.error("Error during message:", error);
+    console.error("Error saving message:", error);
     res.status(500).json({ message: "Failed to save message" });
   }
 };
@@ -64,8 +64,6 @@ const createImageMessage = async (req, res) => {
   const { id } = req.user;
   const { roomId } = req.params;
   const { imageUrl } = req.body;
-
-  console.log(req.imageUrl);
 
   try {
     // Look up and verify particular room that the user message is being sent to
@@ -98,7 +96,7 @@ const createImageMessage = async (req, res) => {
       res.status(201).json({ message: newMessage });
     }
   } catch (error) {
-    console.error("Error during message:", error);
+    console.error("Error saving message:", error);
     res.status(500).json({ message: "Failed to save message" });
   }
 }
@@ -151,7 +149,7 @@ const createLivingRoomMessage = async (req, res) => {
       res.status(201).json({ message: newMessage });
     }
   } catch (error) {
-    console.error("Error during message:", error);
+    console.error("Error saving message:", error);
     res.status(500).json({ message: "Failed to save message" });
   }
 };

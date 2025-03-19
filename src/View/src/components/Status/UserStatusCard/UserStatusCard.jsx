@@ -6,7 +6,7 @@ const USER_STATUS_URL = "/api/user/"
 
 export default function UserStatusCard(props) {
 
-  const { creator } = useContext(UserContext);
+  const { creator, getRefreshToken } = useContext(UserContext);
 
   const { user, mood, setMood, feelings, setFeelings, availability, setAvailability, thoughts, setThoughts, edit, setEdit } = props;
 
@@ -49,13 +49,15 @@ export default function UserStatusCard(props) {
         setEdit(false);
       }
     } catch (error) {
-      // if (!error?.response) {
-      //   console.log("No server response");
-      // } else if (error.response?.status === 401) {
-      //   localStorage.removeItem("user");
-      //   localStorage.removeItem("family");
-      //   navigate("/register");
-      // }
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        getRefreshToken(handleUpdateStatus);
+      } else if (error.response?.status === 500) {
+        console.log("Server error has occured: Error updating user status");
+      } else {
+        console.error("An error occured:", error);
+      }
     }
   }
 

@@ -18,7 +18,7 @@ const ROOM_URL = "/api/room/";
 // const socket = io("http://localhost:5432/", { transports: ["websocket"] });
 
 export default function LivingRoom() {
-  const { user, family, activeTab } = useContext(UserContext);
+  const { user, family, activeTab, getRefreshToken } = useContext(UserContext);
 
   const [activeRoomUsers, setActiveRoomUsers] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -47,15 +47,6 @@ export default function LivingRoom() {
       setScrollPosition(scrollTop); // Update scroll position state
     }
   };
-  
-  // useEffect(() => {
-  //   // Websocket
-  //   const socket = io("http://localhost:5432/", { transports: ["websocket"] });
-
-  //   return () => {
-  //     socket.disconnect(); // Clean up socket connection when component unmounts
-  //   }
-  // }, []);
 
   useEffect(() => {
     if (chatWindowRef.current) {
@@ -100,13 +91,16 @@ export default function LivingRoom() {
           setActiveRoomUsers(activeUsers);
         }
       } catch (error) {
-        // if (!error?.response) {
-        //   console.log("No server response");
-        // } else if (error.response?.status === 401) {
-        //   localStorage.removeItem("user");
-        //   localStorage.removeItem("family");
-        //   navigate("/register");
-        // }
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          getRefreshToken(fetchRoomUsers);
+        } else if (error.response?.status === 500) {
+          setLoadingMessages(true);
+          alert("Server error has occured: Error fetching users");
+        } else {
+          console.error("An error occured:", error);
+        }
       }
     };
 
@@ -127,13 +121,16 @@ export default function LivingRoom() {
           setLoadingMessages(false);
         }
       } catch (error) {
-        // if (!error?.response) {
-        //   console.log("No server response");
-        // } else if (error.response?.status === 401) {
-        //   localStorage.removeItem("user");
-        //   localStorage.removeItem("family");
-        //   navigate("/register");
-        // }
+        if (!error?.response) {
+          console.log("No server response");
+        } else if (error.response?.status === 401) {
+          getRefreshToken(fetchMessages);
+        } else if (error.response?.status === 500) {
+          setLoadingMessages(true);
+          alert("Server error has occured: Error fetching messages");
+        } else {
+          console.error("An error occured:", error);
+        }
       }
     };
 
@@ -167,7 +164,16 @@ export default function LivingRoom() {
             setSkip((prev) => prev + 20);
           }
         } catch (error) {
-          console.log(error);
+          if (!error?.response) {
+            console.log("No server response");
+          } else if (error.response?.status === 401) {
+            getRefreshToken(fetchMoreMessages);
+          } else if (error.response?.status === 500) {
+            setLoadingMoreMessages(true);
+            alert("Server error has occured: Error fetching more messages");
+          } else {
+            console.error("An error occured:", error);
+          }
         }
       };
 
@@ -266,7 +272,17 @@ export default function LivingRoom() {
         setMessageToSend("");
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        getRefreshToken(handleSendMessage);
+      } else if (error.response?.status === 500) {
+        alert("Server error has occured: Failed to send message, try again");
+        // clear input
+        setMessageToSend("");
+      } else {
+        console.error("An error occured:", error);
+      }
     }
   };
   
@@ -302,7 +318,18 @@ export default function LivingRoom() {
         setInputImage(null);
       }
     } catch (error) {
-      console.log(error);
+      if (!error?.response) {
+        console.log("No server response");
+      } else if (error.response?.status === 401) {
+        getRefreshToken(handleSendImageMessage);
+      } else if (error.response?.status === 500) {
+        alert("Server error has occured: Failed to send message, try again");
+        // clear input
+        setImageToSend(null);
+        setInputImage(null);
+      } else {
+        console.error("An error occured:", error);
+      }
     }
   }
 

@@ -48,13 +48,9 @@ export default function Header(props) {
         navigate("/register");
       }
     } catch (error) {
-      // if (!error?.response) {
-      //   console.log("No server response");
-      // } else if (error.response?.status === 400) {
-      //   localStorage.removeItem("user");
-      //   localStorage.removeItem("family");
-      //   navigate("/register");
-      // }
+      localStorage.removeItem("user");
+      localStorage.removeItem("family");
+      navigate("/register");
     }
   };
 
@@ -90,7 +86,7 @@ export default function Header(props) {
               : activeTab === "familyChat"
               ? "Living Room"
               : activeTab === "status"
-              ? "Family Status"
+              ? "Family Statuses"
               : activeTab === "settings"
               ? "Settings"
               : null}

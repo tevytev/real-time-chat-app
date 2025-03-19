@@ -162,6 +162,7 @@
     border-radius: 100px;
     border: none;
     background-color: var(--primary);
+    color: var(--white);
     cursor: pointer;
     transition: all 100ms ease-out;
     max-height: 54px;
