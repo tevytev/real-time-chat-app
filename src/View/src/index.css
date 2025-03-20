@@ -23,11 +23,6 @@
   --gray: #c3c3c3;
   --darkgray: #313235;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
-
-  /* font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; */
 }
 
 a {
@@ -40,9 +35,6 @@ a:hover {
 }
 
 body {
-  /* margin: 0; */
-  /* display: flex; */
-  /* place-items: center; */
   min-width: 320px;
   height: calc(100vh - env(safe-area-inset-bottom));
 }

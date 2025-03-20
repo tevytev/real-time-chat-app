@@ -207,6 +207,10 @@ export default function AuthForm(props) {
               Signup
             </span>
           </small>
+          <div className="test-user-container">
+              <p>Email: testuser@email.com</p>
+              <p>Password: Testuser123!</p>
+          </div>
         </div>
       </>
     );
