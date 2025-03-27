@@ -48,11 +48,20 @@ export default function LivingRoom() {
     }
   };
 
-  useEffect(() => {
-    if (chatWindowRef.current) {
-      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
-    }
-  }, [activeRoomUsers]); // Trigger when messages change
+  useLayoutEffect(() => {
+    const scrollToBottom = () => {
+      if (chatWindowRef.current) {
+        chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+      }
+    };
+
+
+    // Set a delay to allow for the render to complete
+  const timeoutId = setTimeout(scrollToBottom, 1000);
+
+  return () => clearTimeout(timeoutId); // Cleanup the timeout
+  
+  }, [activeRoomUsers]); 
 
   // Effect to add scroll event listener to chat window
   useEffect(() => {

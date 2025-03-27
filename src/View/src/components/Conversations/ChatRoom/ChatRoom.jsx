@@ -228,11 +228,11 @@ export default function ChatRoom(props) {
 
 
     // Set a delay to allow for the render to complete
-  const timeoutId = setTimeout(scrollToBottom, 10);
+  const timeoutId = setTimeout(scrollToBottom, 1000);
 
   return () => clearTimeout(timeoutId); // Cleanup the timeout
 
-  }, [activeRoomUsers, activeRoomId]); // Trigger when messages change
+  }, [activeRoomUsers, activeRoomId]);
 
   const handleFileChange = (e) => {
     const input = document.getElementById("file-upload");
